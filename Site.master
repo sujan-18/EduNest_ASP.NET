@@ -1,0 +1,107 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="SiteMaster" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EduNest | Smart Campus Learning Hub</title>
+    <link rel="stylesheet" type="text/css" href="Content/site.css?v=mobile-nav-1" />
+    <script src="Scripts/validation.js"></script>
+    <script src="Scripts/navigation.js?v=mobile-nav-1" defer></script>
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="appFrame" runat="server" class="app-frame">
+            <asp:PlaceHolder ID="phAppSidebar" runat="server" Visible="false">
+                <aside class="app-sidebar">
+                    <div class="sidebar-brand-row">
+                        <a class="logo sidebar-brand" href="Default.aspx" aria-label="EduNest home">
+                            <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 10.2 12 4l8 6.2v9.3a.9.9 0 0 1-.9.9h-14a.9.9 0 0 1-.9-.9v-9.3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20v-5.8a3 3 0 0 1 6 0V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                            <span class="brand-name">Edu<span>Nest</span><small>Smart Campus Hub</small></span>
+                        </a>
+                        <button type="button" class="nav-toggle" data-nav-toggle="workspaceNav" aria-controls="workspaceNav" aria-expanded="false" aria-label="Open workspace navigation">
+                            <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                        </button>
+                    </div>
+
+                    <div class="sidebar-user">
+                        <span class="user-avatar"><asp:Literal ID="litInitials" runat="server" /></span>
+                        <span class="sidebar-user-info"><asp:Label ID="lblSidebarName" runat="server" CssClass="sidebar-user-name" /><asp:Label ID="lblSidebarRole" runat="server" CssClass="sidebar-user-role" /></span>
+                    </div>
+
+                    <nav id="workspaceNav" class="sidebar-nav" aria-label="Workspace navigation">
+                        <span class="nav-caption">WORKSPACE</span>
+                        <asp:PlaceHolder ID="phStudent" runat="server" Visible="false">
+                            <a class="sidebar-link" href="StudentDashboard.aspx"><span class="nav-icon">&#9638;</span>Dashboard</a>
+                            <a class="sidebar-link" href="Courses.aspx"><span class="nav-icon">&#9635;</span>Courses</a>
+                            <a class="sidebar-link" href="PeerReview.aspx"><span class="nav-icon">&#8646;</span>Peer Review</a>
+                            <a class="sidebar-link" href="StudyScheduler.aspx"><span class="nav-icon">&#9711;</span>Study Rooms</a>
+                        </asp:PlaceHolder>
+                        <asp:PlaceHolder ID="phLecturer" runat="server" Visible="false">
+                            <a class="sidebar-link" href="LecturerDashboard.aspx"><span class="nav-icon">&#9638;</span>Dashboard</a>
+                            <a class="sidebar-link" href="ManageCourses.aspx"><span class="nav-icon">&#9635;</span>My Courses</a>
+                            <a class="sidebar-link" href="ManageLearningPath.aspx"><span class="nav-icon">&#8594;</span>Learning Paths</a>
+                            <a class="sidebar-link" href="ManageQuizzes.aspx"><span class="nav-icon">&#63;</span>Quizzes</a>
+                            <a class="sidebar-link" href="ManageAssignments.aspx"><span class="nav-icon">&#9998;</span>Assignments</a>
+                        </asp:PlaceHolder>
+                        <asp:PlaceHolder ID="phAdmin" runat="server" Visible="false">
+                            <a class="sidebar-link" href="AdminDashboard.aspx"><span class="nav-icon">&#9638;</span>Dashboard</a>
+                            <a class="sidebar-link" href="ManageUsers.aspx"><span class="nav-icon">&#9786;</span>Users</a>
+                            <a class="sidebar-link" href="ManageCourses.aspx"><span class="nav-icon">&#9635;</span>Courses</a>
+                            <a class="sidebar-link" href="ManageLearningPath.aspx"><span class="nav-icon">&#8594;</span>Learning Paths</a>
+                            <a class="sidebar-link" href="ManageQuizzes.aspx"><span class="nav-icon">&#63;</span>Quizzes</a>
+                            <a class="sidebar-link" href="ManageAssignments.aspx"><span class="nav-icon">&#9998;</span>Assignments</a>
+                        </asp:PlaceHolder>
+                    </nav>
+
+                    <div class="sidebar-bottom" id="workspaceNavFooter">
+                        <a class="sidebar-link" href="Default.aspx"><span class="nav-icon">&#8962;</span>Public home</a>
+                        <a class="sidebar-link signout-link" href="Logout.aspx"><span class="nav-icon">&#8617;</span>Sign out</a>
+                    </div>
+                </aside>
+            </asp:PlaceHolder>
+
+            <div class="app-main">
+                <asp:PlaceHolder ID="phPublicHeader" runat="server">
+                    <header class="public-header">
+                        <div class="public-header-inner">
+                            <div class="public-brand-row">
+                                <a class="logo" href="Default.aspx" aria-label="EduNest home">
+                                    <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 10.2 12 4l8 6.2v9.3a.9.9 0 0 1-.9.9h-14a.9.9 0 0 1-.9-.9v-9.3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20v-5.8a3 3 0 0 1 6 0V20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                                    <span class="brand-name">Edu<span>Nest</span></span>
+                                </a>
+                                <button type="button" class="nav-toggle" data-nav-toggle="publicNav" aria-controls="publicNav" aria-expanded="false" aria-label="Open main navigation">
+                                    <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                                </button>
+                            </div>
+                            <nav id="publicNav" class="public-nav" aria-label="Main navigation">
+                                <a href="Default.aspx#features">Features</a>
+                                <a href="Default.aspx#how-it-works">How it works</a>
+                                <a href="Courses.aspx">Courses</a>
+                                <a class="public-login" href="Login.aspx">Sign in</a>
+                                <a class="public-cta" href="Register.aspx">Get started</a>
+                            </nav>
+                        </div>
+                    </header>
+                </asp:PlaceHolder>
+
+                <asp:PlaceHolder ID="phAppTopbar" runat="server" Visible="false">
+                    <header class="app-topbar">
+                        <div><span class="topbar-kicker">YOUR WORKSPACE</span><strong>Welcome back, <asp:Label ID="lblTopbarName" runat="server" /></strong></div>
+                        <div class="topbar-actions"><span class="workspace-badge"><asp:Label ID="lblTopbarRole" runat="server" /></span><a class="topbar-logout" href="Logout.aspx">Sign out &#8599;</a></div>
+                    </header>
+                </asp:PlaceHolder>
+
+                <main class="site-content">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+                </main>
+
+                <asp:PlaceHolder ID="phPublicFooter" runat="server">
+                    <footer class="site-footer"><p>&copy; 2026 EduNest &middot; A smarter space for learning</p></footer>
+                </asp:PlaceHolder>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
