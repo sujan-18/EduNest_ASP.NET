@@ -23,8 +23,13 @@ CREATE TABLE IF NOT EXISTS Courses (
     CourseID        INT AUTO_INCREMENT PRIMARY KEY,
     Title           VARCHAR(150)  NOT NULL,
     Description     TEXT,
+    Category        VARCHAR(60)   NOT NULL DEFAULT 'Technology',
+    Level           ENUM('Beginner','Intermediate','Advanced') NOT NULL DEFAULT 'Beginner',
+    EstimatedHours  SMALLINT UNSIGNED NOT NULL DEFAULT 8,
     LecturerID      INT           NOT NULL,
     CreatedDate     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_course_estimated_hours CHECK (EstimatedHours >= 1),
+    KEY idx_courses_catalog (Category, Level),
     CONSTRAINT fk_course_lecturer FOREIGN KEY (LecturerID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
@@ -104,7 +109,10 @@ CREATE TABLE IF NOT EXISTS AssignmentSubmissions (
     AssignmentID    INT NOT NULL,
     StudentID       INT NOT NULL,
     SubmissionText  TEXT NOT NULL,
+    Grade           DECIMAL(5,2) NULL,
+    Feedback        TEXT NULL,
     SubmittedDate   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_submission_grade CHECK (Grade IS NULL OR Grade BETWEEN 0 AND 100),
     CONSTRAINT fk_submission_assignment FOREIGN KEY (AssignmentID) REFERENCES Assignments(AssignmentID) ON DELETE CASCADE,
     CONSTRAINT fk_submission_student FOREIGN KEY (StudentID) REFERENCES Users(UserID) ON DELETE CASCADE,
     UNIQUE KEY uq_submission (AssignmentID, StudentID)

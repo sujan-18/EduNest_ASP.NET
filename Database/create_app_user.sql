@@ -1,6 +1,6 @@
 -- Optional least-privilege application account for a new/local installation.
 -- Replace the placeholder before running this file, and use the same password
--- in the EduNestDB connection string in Web.config.
+-- in the EduNestDB connection string in Web.ConnectionStrings.config.
 -- Run this script as a MySQL administrator after edunest_db exists.
 
 CREATE USER IF NOT EXISTS 'edunest_app'@'localhost'

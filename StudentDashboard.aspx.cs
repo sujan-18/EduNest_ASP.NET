@@ -14,6 +14,7 @@ public partial class StudentDashboard : System.Web.UI.Page
             LoadSummary();
             LoadQuizScores();
             LoadRecentActivity();
+            LoadUpcomingAssignments();
         }
     }
 
@@ -90,5 +91,23 @@ public partial class StudentDashboard : System.Web.UI.Page
                        ) activity_log ORDER BY ActivityDate DESC LIMIT 10";
         gvActivity.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
         gvActivity.DataBind();
+    }
+
+    private void LoadUpcomingAssignments()
+    {
+        int studentId = AuthHelper.CurrentUserId(this);
+        string sql = @"SELECT a.AssignmentID, a.Title, a.DueDate, c.Title AS CourseTitle,
+                              EXISTS(SELECT 1 FROM AssignmentSubmissions s
+                                  WHERE s.AssignmentID = a.AssignmentID AND s.StudentID = @StudentID) AS HasSubmitted
+                       FROM Assignments a
+                       JOIN Courses c ON c.CourseID = a.CourseID
+                       JOIN Enrollments e ON e.CourseID = c.CourseID AND e.StudentID = @StudentID
+                       WHERE a.DueDate >= CURDATE()
+                       ORDER BY a.DueDate, a.Title
+                       LIMIT 5";
+        var assignments = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        rptUpcomingAssignments.DataSource = assignments;
+        rptUpcomingAssignments.DataBind();
+        pnlNoUpcomingAssignments.Visible = assignments.Rows.Count == 0;
     }
 }

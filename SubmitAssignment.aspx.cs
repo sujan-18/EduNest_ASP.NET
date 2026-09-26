@@ -5,20 +5,28 @@ using EduNest.App_Code;
 
 public partial class SubmitAssignment : System.Web.UI.Page
 {
-    private int AssignmentID { get { return Convert.ToInt32(Request.QueryString["AssignmentID"]); } }
+    private int AssignmentID
+    {
+        get
+        {
+            int assignmentId;
+            return Int32.TryParse(Request.QueryString["AssignmentID"], out assignmentId) ? assignmentId : 0;
+        }
+    }
 
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!AuthHelper.RequireRole(this, "Student")) return;
+        if (AssignmentID <= 0) { Response.Redirect("Courses.aspx"); return; }
         if (!IsPostBack) LoadAssignment();
     }
 
     private void LoadAssignment()
     {
         DataTable assignments = DBHelper.ExecuteQuery(
-            @"SELECT a.Title, a.Description FROM Assignments a
+            @"SELECT a.Title, a.Description, a.DueDate FROM Assignments a
               JOIN Enrollments e ON e.CourseID = a.CourseID
-              WHERE a.AssignmentID = @AssignmentID AND e.StudentID = @StudentID AND a.DueDate >= CURDATE()",
+              WHERE a.AssignmentID = @AssignmentID AND e.StudentID = @StudentID",
             new MySqlParameter("@AssignmentID", AssignmentID),
             new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
         if (assignments.Rows.Count == 0)
@@ -27,18 +35,38 @@ public partial class SubmitAssignment : System.Web.UI.Page
             return;
         }
         DataRow assignment = assignments.Rows[0];
+        bool deadlinePassed = Convert.ToDateTime(assignment["DueDate"]).Date < DateTime.Today;
 
         litTitle.Text = Server.HtmlEncode(assignment["Title"].ToString());
         litDescription.Text = Server.HtmlEncode(assignment["Description"].ToString());
 
         DataTable existing = DBHelper.ExecuteQuery(
-            "SELECT SubmissionText FROM AssignmentSubmissions WHERE AssignmentID = @AssignmentID AND StudentID = @StudentID",
+            "SELECT SubmissionText, Grade, Feedback FROM AssignmentSubmissions WHERE AssignmentID = @AssignmentID AND StudentID = @StudentID",
             new MySqlParameter("@AssignmentID", AssignmentID),
             new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
 
         if (existing.Rows.Count > 0)
         {
-            txtSubmission.Text = existing.Rows[0]["SubmissionText"].ToString();
+            DataRow submission = existing.Rows[0];
+            txtSubmission.Text = submission["SubmissionText"].ToString();
+            if (submission["Grade"] != DBNull.Value || submission["Feedback"] != DBNull.Value)
+            {
+                pnlReview.Visible = true;
+                litGrade.Text = submission["Grade"] == DBNull.Value ? "Pending" : Server.HtmlEncode(Convert.ToDecimal(submission["Grade"]).ToString("0.##")) + " / 100";
+                litFeedback.Text = submission["Feedback"] == DBNull.Value ? "No written feedback was added." : Server.HtmlEncode(submission["Feedback"].ToString()).Replace("\r\n", "<br />").Replace("\n", "<br />");
+            }
+        }
+        else if (deadlinePassed)
+        {
+            Response.Redirect("Assignments.aspx");
+            return;
+        }
+
+        if (deadlinePassed)
+        {
+            pnlSubmissionForm.Visible = false;
+            pnlClosed.Visible = true;
+            litClosed.Text = "The submission deadline has passed. You can still review your saved submission and lecturer feedback on this page.";
         }
     }
 
@@ -58,12 +86,13 @@ public partial class SubmitAssignment : System.Web.UI.Page
         DBHelper.ExecuteNonQuery(
             @"INSERT INTO AssignmentSubmissions (AssignmentID, StudentID, SubmissionText)
               VALUES (@AssignmentID, @StudentID, @Text)
-              ON DUPLICATE KEY UPDATE SubmissionText = @Text, SubmittedDate = CURRENT_TIMESTAMP",
+              ON DUPLICATE KEY UPDATE SubmissionText = @Text, Grade = NULL, Feedback = NULL, SubmittedDate = CURRENT_TIMESTAMP",
             new MySqlParameter("@AssignmentID", AssignmentID),
             new MySqlParameter("@StudentID", studentId),
             new MySqlParameter("@Text", txtSubmission.Text.Trim()));
 
         pnlMessage.Visible = true;
         litMessage.Text = "Your assignment has been submitted.";
+        pnlReview.Visible = false;
     }
 }

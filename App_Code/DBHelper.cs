@@ -20,7 +20,7 @@ namespace EduNest.App_Code
                 if (settings == null || String.IsNullOrWhiteSpace(settings.ConnectionString))
                 {
                     throw new ConfigurationErrorsException(
-                        "The 'EduNestDB' connection string is missing or empty. Add it to Web.config and set the MySQL server, database, user, and password.");
+                        "The 'EduNestDB' connection string is missing or empty. Add it to Web.ConnectionStrings.config and set the MySQL server, database, user, and password.");
                 }
                 return settings.ConnectionString;
             }

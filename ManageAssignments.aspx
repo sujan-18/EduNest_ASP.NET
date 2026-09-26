@@ -1,7 +1,7 @@
 <%@ Page Title="Manage Assignments" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="ManageAssignments.aspx.cs" Inherits="ManageAssignments" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h1>Manage Assignments</h1>
+    <div class="page-title-row"><div><h1>Manage Assignments</h1><p>Create course projects and track submissions.</p></div><a class="btn btn-outline" href="ReviewSubmissions.aspx">Review student work</a></div>
 
     <div class="form-group">
         <label>Select Course</label>

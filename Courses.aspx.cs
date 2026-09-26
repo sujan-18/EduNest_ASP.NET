@@ -12,10 +12,13 @@ public partial class Courses : System.Web.UI.Page
 
     private void LoadCourses()
     {
-        string sql = @"SELECT c.CourseID, c.Title, c.Description, u.FullName AS LecturerName
+        int studentId = IsStudent() ? AuthHelper.CurrentUserId(this) : 0;
+        string sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours,
+                              u.FullName AS LecturerName,
+                              EXISTS(SELECT 1 FROM Enrollments e WHERE e.CourseID = c.CourseID AND e.StudentID = @StudentID) AS IsEnrolled
                         FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
-                        ORDER BY c.CreatedDate DESC";
-        rptCourses.DataSource = DBHelper.ExecuteQuery(sql);
+                        ORDER BY c.Category, c.Title";
+        rptCourses.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
         rptCourses.DataBind();
     }
 

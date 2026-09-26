@@ -12,6 +12,8 @@ public partial class AdminDashboard : System.Web.UI.Page
             litCourseCount.Text = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM Courses").ToString();
             litEnrollmentCount.Text = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments").ToString();
             litQuizAttempts.Text = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM QuizAttempts").ToString();
+            litPendingReviews.Text = DBHelper.ExecuteScalar(
+                "SELECT COUNT(*) FROM AssignmentSubmissions WHERE Grade IS NULL AND (Feedback IS NULL OR TRIM(Feedback) = '')").ToString();
         }
     }
 }

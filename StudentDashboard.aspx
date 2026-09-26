@@ -41,6 +41,14 @@
                         <EmptyDataTemplate>You haven't attempted a quiz yet.</EmptyDataTemplate>
                     </asp:GridView>
                 </section>
+                <section class="dashboard-panel deadline-panel"><div class="page-section-heading"><div><span class="eyebrow">PLAN AHEAD</span><h2>Upcoming assignments</h2></div><a class="text-link" href="Courses.aspx">Find courses</a></div>
+                    <asp:Repeater ID="rptUpcomingAssignments" runat="server">
+                        <HeaderTemplate><div class="deadline-list"></HeaderTemplate>
+                        <ItemTemplate><article class="deadline-item"><div class="deadline-copy"><strong><%#: Eval("Title") %></strong><small><%#: Eval("CourseTitle") %> &middot; Due <%#: Eval("DueDate", "{0:dd MMM}") %></small></div><span class='deadline-status <%# Convert.ToBoolean(Eval("HasSubmitted")) ? "is-submitted" : "is-pending" %>'><%# Convert.ToBoolean(Eval("HasSubmitted")) ? "Submitted" : "To do" %></span><a href='SubmitAssignment.aspx?AssignmentID=<%# Eval("AssignmentID") %>' aria-label="Open assignment">&#8594;</a></article></ItemTemplate>
+                        <FooterTemplate></div></FooterTemplate>
+                    </asp:Repeater>
+                    <asp:Panel ID="pnlNoUpcomingAssignments" runat="server" CssClass="empty-state" Visible="false"><strong>You're all caught up.</strong><p>New assignment deadlines will appear here.</p></asp:Panel>
+                </section>
             </aside>
         </div>
 

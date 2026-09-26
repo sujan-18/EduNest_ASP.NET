@@ -4,7 +4,7 @@ This guide describes the EduNest source files, required software, database setup
 
 ## What EduNest is
 
-EduNest is an ASP.NET Web Forms website using C#, .NET Framework 4.8, MySQL, and CSS. It provides public course browsing and registration, student learning and progress pages, lecturer course content management, and administrator user and content management.
+EduNest is an ASP.NET Web Forms website using C#, .NET Framework 4.8, MySQL, and CSS. It provides a searchable technology course catalog, enrollment, learning paths, quizzes, assignments with lecturer grading and feedback, peer reviews, study sessions, and role-based student, lecturer, and administrator workspaces.
 
 This is an **ASP.NET Web Site** project. It intentionally has no `.sln` or `.csproj` file. Visual Studio opens the folder as a Web Site and compiles its `.aspx` pages and code-behind files when the site runs.
 
@@ -25,7 +25,9 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 
 - `Default.aspx` and `Default.aspx.cs` — public home page and its server-side course count/featured course loading.
 - `Site.master` and `Site.master.cs` — shared page shell, public navigation, authenticated role navigation, top bar, footer, and user/session display.
-- `Web.config` — .NET Framework settings, session behavior, ASP.NET configuration, and the `EduNestDB` MySQL connection string.
+- `Web.config` — .NET Framework settings, session behavior, ASP.NET configuration, and a reference to the local connection-string file.
+- `Web.ConnectionStrings.config` — machine-local MySQL credentials; ignored by Git so the app password is not included in source control.
+- `Web.ConnectionStrings.example.config` — safe template to copy when setting up the project on another computer.
 - `packages.config` — NuGet package names and versions used by the .NET Framework 4.8 site.
 - `bin/` — runtime assemblies that the Web Site loads, including MySql.Data and its dependencies.
 
@@ -41,6 +43,7 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 - `Login.aspx` and `Login.aspx.cs` — login and session creation.
 - `Logout.aspx` and `Logout.aspx.cs` — clears the signed-in session.
 - `Courses.aspx` and `Courses.aspx.cs` — course catalog and student enrollment action.
+- `Scripts/course-catalog.js` — live catalog search, category/level filters, sorting, and result count.
 - `LearningPath.aspx` and `LearningPath.aspx.cs` — course topic path and student progress actions.
 
 ### Student pages
@@ -50,6 +53,7 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 - `TakeQuiz.aspx` and `.aspx.cs` — quiz questions, answer submission, and result handling.
 - `Assignments.aspx` and `.aspx.cs` — assignments for an enrolled course.
 - `SubmitAssignment.aspx` and `.aspx.cs` — assignment submission form/action.
+- `ReviewSubmissions.aspx` and `.aspx.cs` — lecturer/admin submission review, grading, and written feedback. Students can see the review on their submission page.
 - `PeerReview.aspx` and `.aspx.cs` — peer feedback features.
 - `StudyScheduler.aspx` and `.aspx.cs` — create, join, leave, and cancel study sessions.
 
@@ -70,27 +74,38 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 - `Scripts/validation.js` — client-side validation support.
 - `Scripts/navigation.js` — responsive hamburger menus for the public header and signed-in workspace navigation.
 - `Database/edunest_schema.sql` — safely creates all database tables and inserts demo accounts/sample content. It is repeatable and does not drop existing data.
+- `Database/upgrade_platform_features.sql` — safely adds course category, level, estimated hours, and assignment grading fields to an existing database.
 - `Database/upgrade_data_constraints.sql` — adds database validation constraints to an existing installation; safe to run again.
+- `Database/seed_modern_courses.sql` — repeatably adds ten modern technology courses, each with an ordered four-topic learning path, quiz questions, and a practical assignment.
 - `Database/create_app_user.sql` — template for creating an application-only MySQL account with CRUD permissions limited to `edunest_db`.
 
 Each `.aspx` file contains page markup; its matching `.aspx.cs` file contains that page's C# server-side behavior. The shared master page provides the common navigation and responsive layout.
 
 ## Run it in Visual Studio 2022
 
-### 1. Start MySQL and create the sample database
+Follow these steps on every computer where you want to run EduNest. MySQL stores the data; Visual Studio runs the website and connects to MySQL using the connection-string file. Visual Studio does not create or migrate this database automatically.
 
-1. Start the MySQL Server service.
-2. Open MySQL Workbench and connect to the local server.
-3. Open `Database/edunest_schema.sql` from this project and execute the full script.
-4. Open `Database/upgrade_data_constraints.sql` and execute it. This adds missing validation checks to the existing database without clearing rows.
-5. For a least-privilege app login, open `Database/create_app_user.sql`, replace both copies of `REPLACE_WITH_A_LONG_RANDOM_PASSWORD` with the same strong password, then execute it as a MySQL administrator. The account can read and change rows in `edunest_db` but cannot administer the MySQL server.
-6. Confirm that the `edunest_db` schema and its 13 tables appear in Workbench.
+### 1. Start MySQL and initialize the database
 
-The schema script can be safely rerun: it uses `CREATE ... IF NOT EXISTS` and only inserts demo records when their email/title keys are absent. It does not overwrite edited demo records or delete application data. The separate `upgrade_data_constraints.sql` file adds check constraints once and can also be rerun.
+1. Start the MySQL Server 8 service. In Windows, you can check **Services** for a running service named `MySQL80` (the exact name may differ by installation).
+2. Open MySQL Workbench and connect as the MySQL administrator account created during MySQL installation. The default server settings in this guide are `127.0.0.1`, port `3306`.
+3. In Workbench, use **File > Open SQL Script** to open each script from this project, then click the lightning-bolt execute button. Run them in this order:
+   1. `Database/edunest_schema.sql`
+   2. `Database/upgrade_platform_features.sql`
+   3. `Database/upgrade_data_constraints.sql`
+   4. `Database/create_app_user.sql` (first replace both password placeholders with one strong password)
+   5. `Database/seed_modern_courses.sql`
+4. In Workbench's Schemas panel, click refresh and confirm `edunest_db` appears. Expand **Tables** to see the 13 tables.
+5. Optional connection check in Workbench: create a new connection using host `127.0.0.1`, port `3306`, username `edunest_app`, and the password you chose. Connect and run `SELECT COUNT(*) FROM edunest_db.Courses;`. A fresh sample database should return 12.
 
-### 2. Set the connection string
+The schema script creates missing tables and original sample records; it does not drop tables or delete rows. The two upgrade scripts add fields and validation constraints to existing installations. The modern course seed can be rerun without duplicating its catalog. These SQL scripts are the project's database setup/migration process; there is no Entity Framework migration command and no migration button in Visual Studio. Run the scripts in Workbench when setting up or upgrading the MySQL database, not every time you press F5.
 
-Open `Web.config` and edit the `EduNestDB` connection string so the server, port, username, and password match the database account you created. The local workspace is configured with an `edunest_app` account; on a new computer use the password you placed in `create_app_user.sql`:
+The catalog includes ten additional technology tracks: full-stack engineering, generative AI, data science, cloud, cybersecurity, Flutter, DevOps, UI/UX, blockchain, and database engineering. With the two original sample courses, a fresh demo database contains 12 courses. Each modern course includes four topics, a quiz with knowledge-check questions, and a project assignment. Students can search, filter by subject or level, sort by title or workload, enroll, and continue a course. Lecturers can manage course metadata and learning materials, review submissions, and return grades and feedback. Student dashboards show upcoming assignment deadlines.
+
+### 2. Configure the website's database connection
+
+1. In File Explorer, open the project folder (the folder containing `Web.config`). Copy `Web.ConnectionStrings.example.config` and rename the copy to exactly `Web.ConnectionStrings.config`. Keep both files in this same folder. If Windows hides file extensions, ensure the new name is not accidentally `Web.ConnectionStrings.config.config`.
+2. Open `Web.ConnectionStrings.config` in Visual Studio or Notepad. Set the server, port, database, username, and password to match your MySQL setup. For the supplied app account, leave the first four values as shown and replace only `YOUR_APP_PASSWORD` with the password used when running `create_app_user.sql`:
 
 ```xml
 <add name="EduNestDB"
@@ -98,21 +113,26 @@ Open `Web.config` and edit the `EduNestDB` connection string so the server, port
      providerName="MySql.Data.MySqlClient" />
 ```
 
-Replace `YOUR_APP_PASSWORD` with the same password used in `create_app_user.sql`. Save `Web.config` after editing it. Do not share a real database password in screenshots or source control. If you use a different MySQL account, grant it `SELECT`, `INSERT`, `UPDATE`, and `DELETE` privileges on `edunest_db`.
+3. Save the file. Do not paste the password into `Web.config`; `Web.config` loads the separate connection-string file. The local file is ignored by Git so credentials are not committed. If you choose another MySQL account, grant it `SELECT`, `INSERT`, `UPDATE`, and `DELETE` on `edunest_db`.
+
+The application connects when a page first reads or writes database data. It does not require a separate database connector program to be launched from Visual Studio; the MySql.Data provider assemblies are included under `bin/`. MySQL Server must remain running while using the site.
 
 ### 3. Open the site folder in Visual Studio
 
 1. Launch Visual Studio 2022.
 2. Select **File > Open > Web Site...**.
 3. Choose the `EduNest` project folder (the folder containing `Web.config`, `Site.master`, and `Default.aspx`).
-4. If asked to restore NuGet packages, allow Visual Studio to restore them.
+4. If asked to restore NuGet packages, allow Visual Studio to restore them. The project also includes its runtime provider files in `bin/`.
 5. In Solution Explorer, right-click `Default.aspx` and choose **Set as Start Page** if Visual Studio does not select the home page automatically.
+6. Confirm `Web.ConnectionStrings.config` is in the project root beside `Web.config`. If it is not visible in Solution Explorer, use **Show All Files**; it still needs to exist on disk, but does not need to be included in the project file.
 
 Do not use **Open > Project/Solution** for this folder; it has no `.sln` or `.csproj` because it is a Web Site project.
 
-### 4. Run and stop
+### 4. Run, connect, and sign in
 
-Select **IIS Express** in the Visual Studio run target, then press **F5** to run with debugging or **Ctrl+F5** to run without debugging. Visual Studio opens the site at a local `http://localhost:<port>/` address. The chosen port may differ between runs. Use the URL shown by Visual Studio, then navigate from the home page.
+Select **IIS Express** in the Visual Studio run target, then press **F5** to run with debugging or **Ctrl+F5** to run without debugging. Visual Studio opens the site at a local `http://localhost:<port>/` address. The chosen port may differ between runs. Use the URL shown by Visual Studio, then navigate from the home page. The home page loads its featured courses and course count through `App_Code/DBHelper.cs`, so if it displays those database-backed values without an error, the website has connected successfully.
+
+Sign in with a demo account below to open that role's workspace. For a quick database write check, sign in as Lecturer and create a temporary course in **Manage Courses**; confirm it appears in the catalog, then remove it. Student pages such as quizzes and assignments require enrollment in the selected course.
 
 To stop the site, select **Debug > Stop Debugging** or press **Shift+F5**. Keep MySQL Server running while using pages that read or write database data.
 
@@ -130,9 +150,13 @@ New public registrations create student accounts. Staff roles are intended to be
 
 ## Troubleshooting
 
-- **Cannot connect to MySQL / connection refused:** make sure the MySQL Server service is running and that `Server`, `Port`, `Uid`, and `Pwd` in `Web.config` match it.
-- **Database permissions error:** confirm `edunest_app` was created and granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` rights on `edunest_db`, and that the password matches `Web.config`. The application does not need database administrator privileges after setup.
+- **Cannot connect to MySQL / connection refused:** make sure the MySQL Server service is running and that `Server`, `Port`, `Uid`, and `Pwd` in `Web.ConnectionStrings.config` match it.
+- **Database permissions error:** confirm `edunest_app` was created and granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` rights on `edunest_db`, and that the password matches `Web.ConnectionStrings.config`. The application does not need database administrator privileges after setup.
 - **Unknown database `edunest_db`:** create the schema by executing `Database/edunest_schema.sql`.
+- **The home page loads but a database page shows a server error:** verify that MySQL Server is running, the schema and all scripts above ran successfully, and `Web.ConnectionStrings.config` is beside `Web.config`. Check the username/password using the optional Workbench app-account connection check. Restart IIS Express after changing the config, then reload the page. For the detailed ASP.NET error, run with F5 and inspect Visual Studio's **Output** window.
+- **Catalog or grading columns are missing:** execute `Database/upgrade_platform_features.sql`, then `Database/upgrade_data_constraints.sql`.
+- **Modern courses are not listed:** execute `Database/seed_modern_courses.sql` after the schema and feature upgrade scripts.
+- **Missing connection-string configuration:** copy `Web.ConnectionStrings.example.config` to `Web.ConnectionStrings.config` in the same folder as `Web.config`; `Web.config` expects that file to exist.
 - **Access denied for MySQL user:** correct the username/password or grant that MySQL account access to `edunest_db`.
 - **Provider or MySql.Data assembly error:** restore packages from `packages.config` and confirm the project `bin/` folder contains `MySql.Data.dll` and its provider dependencies.
 - **Targeting pack or reference assemblies error:** modify the Visual Studio installation and add the .NET Framework 4.8 development tools/targeting pack.

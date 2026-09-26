@@ -44,6 +44,7 @@
                             <a class="sidebar-link" href="ManageLearningPath.aspx"><span class="nav-icon">&#8594;</span>Learning Paths</a>
                             <a class="sidebar-link" href="ManageQuizzes.aspx"><span class="nav-icon">&#63;</span>Quizzes</a>
                             <a class="sidebar-link" href="ManageAssignments.aspx"><span class="nav-icon">&#9998;</span>Assignments</a>
+                            <a class="sidebar-link" href="ReviewSubmissions.aspx"><span class="nav-icon">&#10003;</span>Review work</a>
                         </asp:PlaceHolder>
                         <asp:PlaceHolder ID="phAdmin" runat="server" Visible="false">
                             <a class="sidebar-link" href="AdminDashboard.aspx"><span class="nav-icon">&#9638;</span>Dashboard</a>
@@ -52,6 +53,7 @@
                             <a class="sidebar-link" href="ManageLearningPath.aspx"><span class="nav-icon">&#8594;</span>Learning Paths</a>
                             <a class="sidebar-link" href="ManageQuizzes.aspx"><span class="nav-icon">&#63;</span>Quizzes</a>
                             <a class="sidebar-link" href="ManageAssignments.aspx"><span class="nav-icon">&#9998;</span>Assignments</a>
+                            <a class="sidebar-link" href="ReviewSubmissions.aspx"><span class="nav-icon">&#10003;</span>Submissions</a>
                         </asp:PlaceHolder>
                     </nav>
 

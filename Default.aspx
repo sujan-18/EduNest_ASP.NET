@@ -71,7 +71,7 @@
             <ItemTemplate>
                 <article class="course-card">
                     <div class="course-cover"><span class="cover-orbit"></span><span class="cover-code">EDUNEST COURSE</span><span class="cover-symbol">&#9998;</span></div>
-                    <div class="course-info"><span class="course-label">FEATURED COURSE</span><h3><%#: Eval("Title") %></h3><p><%#: Eval("Description") %></p><div class="course-meta"><span class="badge badge-lecturer">By <%#: Eval("LecturerName") %></span><a href="Courses.aspx" aria-label="Explore courses">&#8594;</a></div></div>
+                    <div class="course-info"><span class="course-label"><%#: Eval("Category") %></span><h3><%#: Eval("Title") %></h3><p><%#: Eval("Description") %></p><div class="course-meta"><span class="badge badge-lecturer"><%#: Eval("Level") %> &middot; <%#: Eval("EstimatedHours") %> hours</span><a href="Courses.aspx" aria-label="Explore courses">&#8594;</a></div></div>
                 </article>
             </ItemTemplate>
             <FooterTemplate></div></FooterTemplate>

@@ -18,7 +18,7 @@ public partial class ManageCourses : System.Web.UI.Page
         if (role == "Admin")
         {
             // Admin sees every course in the system
-            sql = @"SELECT c.CourseID, c.Title, c.Description, u.FullName AS LecturerName
+            sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
                      FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
                      ORDER BY c.CreatedDate DESC";
             gvCourses.DataSource = DBHelper.ExecuteQuery(sql);
@@ -26,7 +26,7 @@ public partial class ManageCourses : System.Web.UI.Page
         else
         {
             // Lecturers only manage their own courses
-            sql = @"SELECT c.CourseID, c.Title, c.Description, u.FullName AS LecturerName
+            sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
                      FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
                      WHERE c.LecturerID = @LecturerID
                      ORDER BY c.CreatedDate DESC";
@@ -40,14 +40,25 @@ public partial class ManageCourses : System.Web.UI.Page
     {
         if (!Page.IsValid) return;
 
+        int estimatedHours;
+        if (!TryReadCourseMetadata(ddlCategory.SelectedValue, ddlLevel.SelectedValue, txtEstimatedHours.Text, out estimatedHours))
+        {
+            ShowMessage("Choose a course category and level, and enter learning hours from 1 to 200.");
+            return;
+        }
+
         DBHelper.ExecuteNonQuery(
-            "INSERT INTO Courses (Title, Description, LecturerID) VALUES (@Title, @Description, @LecturerID)",
+            "INSERT INTO Courses (Title, Description, Category, Level, EstimatedHours, LecturerID) VALUES (@Title, @Description, @Category, @Level, @Hours, @LecturerID)",
             new MySqlParameter("@Title", txtTitle.Text.Trim()),
             new MySqlParameter("@Description", txtDescription.Text.Trim()),
+            new MySqlParameter("@Category", ddlCategory.SelectedValue),
+            new MySqlParameter("@Level", ddlLevel.SelectedValue),
+            new MySqlParameter("@Hours", estimatedHours),
             new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
 
         txtTitle.Text = "";
         txtDescription.Text = "";
+        txtEstimatedHours.Text = "12";
         ShowMessage("Course added successfully.");
         BindGrid();
     }
@@ -79,19 +90,24 @@ public partial class ManageCourses : System.Web.UI.Page
 
         string newTitle = ((System.Web.UI.WebControls.TextBox)row.FindControl("txtEditTitle")).Text.Trim();
         string newDescription = ((System.Web.UI.WebControls.TextBox)row.FindControl("txtEditDescription")).Text.Trim();
+        string category = ((System.Web.UI.WebControls.TextBox)row.FindControl("txtEditCategory")).Text.Trim();
+        string level = ((System.Web.UI.WebControls.DropDownList)row.FindControl("ddlEditLevel")).SelectedValue;
+        string hoursText = ((System.Web.UI.WebControls.TextBox)row.FindControl("txtEditHours")).Text;
+        int estimatedHours;
 
-        if (string.IsNullOrEmpty(newTitle))
+        if (string.IsNullOrEmpty(newTitle) || !TryReadCourseMetadata(category, level, hoursText, out estimatedHours))
         {
-            ShowMessage("Title cannot be empty. Update cancelled.");
-            gvCourses.EditIndex = -1;
-            BindGrid();
+            ShowMessage("Enter a course title, valid category and level, and learning hours from 1 to 200.");
             return;
         }
 
         DBHelper.ExecuteNonQuery(
-            "UPDATE Courses SET Title = @Title, Description = @Description WHERE CourseID = @CourseID AND (@IsAdmin = 1 OR LecturerID = @LecturerID)",
+            "UPDATE Courses SET Title = @Title, Description = @Description, Category = @Category, Level = @Level, EstimatedHours = @Hours WHERE CourseID = @CourseID AND (@IsAdmin = 1 OR LecturerID = @LecturerID)",
             new MySqlParameter("@Title", newTitle),
             new MySqlParameter("@Description", newDescription),
+            new MySqlParameter("@Category", category),
+            new MySqlParameter("@Level", level),
+            new MySqlParameter("@Hours", estimatedHours),
             new MySqlParameter("@CourseID", courseId),
             new MySqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
             new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
@@ -129,6 +145,14 @@ public partial class ManageCourses : System.Web.UI.Page
             new MySqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
             new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
         return Convert.ToInt32(result) > 0;
+    }
+
+    private bool TryReadCourseMetadata(string category, string level, string hoursText, out int estimatedHours)
+    {
+        string[] allowedCategories = { "Web Development", "AI & Machine Learning", "Data & Analytics", "Cloud & DevOps", "Cybersecurity", "Mobile Development", "Product Design", "Web3 & Blockchain" };
+        string[] allowedLevels = { "Beginner", "Intermediate", "Advanced" };
+        bool validHours = Int32.TryParse(hoursText, out estimatedHours) && estimatedHours >= 1 && estimatedHours <= 200;
+        return Array.IndexOf(allowedCategories, category) >= 0 && Array.IndexOf(allowedLevels, level) >= 0 && validHours;
     }
 
     private void ShowMessage(string message)

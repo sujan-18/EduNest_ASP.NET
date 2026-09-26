@@ -1,0 +1,5 @@
+# Local MySQL credentials for this machine. Create from the example config.
+Web.ConnectionStrings.config
+
+# Per-user Visual Studio workspace state
+.vs/

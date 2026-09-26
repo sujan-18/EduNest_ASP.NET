@@ -30,8 +30,10 @@ END$$
 DELIMITER ;
 
 CALL EduNestAddCheckIfMissing('chk_topic_sequence', 'LearningPathTopics', 'SequenceOrder >= 1');
+CALL EduNestAddCheckIfMissing('chk_course_estimated_hours', 'Courses', 'EstimatedHours >= 1');
 CALL EduNestAddCheckIfMissing('chk_question_correct_option', 'QuizQuestions', "CorrectOption IN ('A','B','C','D')");
 CALL EduNestAddCheckIfMissing('chk_quiz_attempt_score', 'QuizAttempts', 'Score >= 0 AND TotalQuestions >= 1 AND Score <= TotalQuestions');
 CALL EduNestAddCheckIfMissing('chk_peer_review_rating', 'PeerReviews', 'Rating BETWEEN 1 AND 5');
+CALL EduNestAddCheckIfMissing('chk_submission_grade', 'AssignmentSubmissions', 'Grade IS NULL OR Grade BETWEEN 0 AND 100');
 
 DROP PROCEDURE EduNestAddCheckIfMissing;
