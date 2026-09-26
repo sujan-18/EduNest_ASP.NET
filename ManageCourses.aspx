@@ -26,7 +26,7 @@
                 <asp:DropDownList ID="ddlCategory" runat="server">
                     <asp:ListItem>Web Development</asp:ListItem><asp:ListItem>AI &amp; Machine Learning</asp:ListItem>
                     <asp:ListItem>Data &amp; Analytics</asp:ListItem><asp:ListItem>Cloud &amp; DevOps</asp:ListItem>
-                    <asp:ListItem>Cybersecurity</asp:ListItem><asp:ListItem>Mobile Development</asp:ListItem>
+                    <asp:ListItem>Networking &amp; Infrastructure</asp:ListItem><asp:ListItem>Cybersecurity</asp:ListItem><asp:ListItem>Mobile Development</asp:ListItem>
                     <asp:ListItem>Product Design</asp:ListItem><asp:ListItem>Web3 &amp; Blockchain</asp:ListItem>
                 </asp:DropDownList>
             </div>

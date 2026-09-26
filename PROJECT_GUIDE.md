@@ -36,6 +36,7 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 - `App_Code/DBHelper.cs` — central MySQL access methods (`ExecuteQuery`, `ExecuteNonQuery`, `ExecuteScalar`, and insert-with-ID). Pages use parameters for values passed to SQL.
 - `App_Code/AuthHelper.cs` — shared session and role checks for protected pages.
 - `App_Code/PasswordHelper.cs` — password hashing and verification routines.
+- `App_Code/CourseVisualHelper.cs` — selects a bundled local illustration for each course subject category.
 
 ### Public account and course pages
 
@@ -50,6 +51,7 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 
 - `StudentDashboard.aspx` and `.aspx.cs` — enrolled course progress and student activity.
 - `Quizzes.aspx` and `.aspx.cs` — quizzes available for an enrolled course.
+- `MyQuizzes.aspx` and `.aspx.cs` — student quiz center across enrolled courses, showing question counts, attempt counts, and latest scores.
 - `TakeQuiz.aspx` and `.aspx.cs` — quiz questions, answer submission, and result handling.
 - `Assignments.aspx` and `.aspx.cs` — assignments for an enrolled course.
 - `SubmitAssignment.aspx` and `.aspx.cs` — assignment submission form/action.
@@ -71,12 +73,14 @@ The project uses the **MySql.Data / Connector/NET** ADO.NET provider. Its packag
 
 - `Content/site.css` — global layout, component styling, and responsive rules for desktop, tablet, and mobile screens.
 - `Images/` — local image assets used by the pages; these load from the project rather than an external image service.
+- `Images/Courses/` — local SVG course illustrations for AI, networking, data science, cloud, cybersecurity, mobile, design, blockchain, and web development.
+- `Scripts/page-motion.js` — homepage reveal and page transition effects, with reduced-motion support.
 - `Scripts/validation.js` — client-side validation support.
 - `Scripts/navigation.js` — responsive hamburger menus for the public header and signed-in workspace navigation.
 - `Database/edunest_schema.sql` — safely creates all database tables and inserts demo accounts/sample content. It is repeatable and does not drop existing data.
 - `Database/upgrade_platform_features.sql` — safely adds course category, level, estimated hours, and assignment grading fields to an existing database.
 - `Database/upgrade_data_constraints.sql` — adds database validation constraints to an existing installation; safe to run again.
-- `Database/seed_modern_courses.sql` — repeatably adds ten modern technology courses, each with an ordered four-topic learning path, quiz questions, and a practical assignment.
+- `Database/seed_modern_courses.sql` — repeatably adds eleven modern technology courses, each with an ordered four-topic learning path, quiz questions, and a practical assignment.
 - `Database/create_app_user.sql` — template for creating an application-only MySQL account with CRUD permissions limited to `edunest_db`.
 
 Each `.aspx` file contains page markup; its matching `.aspx.cs` file contains that page's C# server-side behavior. The shared master page provides the common navigation and responsive layout.
@@ -98,9 +102,9 @@ Follow these steps on every computer where you want to run EduNest. MySQL stores
 4. In Workbench's Schemas panel, click refresh and confirm `edunest_db` appears. Expand **Tables** to see the 13 tables.
 5. Optional connection check in Workbench: create a new connection using host `127.0.0.1`, port `3306`, username `edunest_app`, and the password you chose. Connect and run `SELECT COUNT(*) FROM edunest_db.Courses;`. A fresh sample database should return 12.
 
-The schema script creates missing tables and original sample records; it does not drop tables or delete rows. The two upgrade scripts add fields and validation constraints to existing installations. The modern course seed can be rerun without duplicating its catalog. These SQL scripts are the project's database setup/migration process; there is no Entity Framework migration command and no migration button in Visual Studio. Run the scripts in Workbench when setting up or upgrading the MySQL database, not every time you press F5.
+The schema script creates missing tables and original sample records; it does not drop tables or delete rows. The two upgrade scripts add fields and validation constraints to existing installations. The modern course seed can be rerun without duplicating its catalog; rerun it in Workbench on an existing database to add newly added course tracks such as Networking & Infrastructure. These SQL scripts are the project's database setup/migration process; there is no Entity Framework migration command and no migration button in Visual Studio. Run the scripts in Workbench when setting up or upgrading the MySQL database, not every time you press F5.
 
-The catalog includes ten additional technology tracks: full-stack engineering, generative AI, data science, cloud, cybersecurity, Flutter, DevOps, UI/UX, blockchain, and database engineering. With the two original sample courses, a fresh demo database contains 12 courses. Each modern course includes four topics, a quiz with knowledge-check questions, and a project assignment. Students can search, filter by subject or level, sort by title or workload, enroll, and continue a course. Lecturers can manage course metadata and learning materials, review submissions, and return grades and feedback. Student dashboards show upcoming assignment deadlines.
+The catalog includes eleven additional technology tracks: full-stack engineering, generative AI, data science, networking, cloud, cybersecurity, Flutter, DevOps, UI/UX, blockchain, and database engineering. With the two original sample courses, a fresh demo database contains 13 courses. Each modern course includes four topics, a quiz with knowledge-check questions, and a project assignment. Course cards use local subject-specific SVG illustrations rather than generic text-only covers or remote image links. Students can search, filter by subject or level, sort by title or workload, enroll, and continue a course. In **My Quizzes**, students can filter by subject (such as AI, networking, or data science) and by a specific enrolled course. It shows question counts, attempts, and latest scores. Quizzes use multiple-choice questions, automatic scoring, saved attempts, and retakes. The student dashboard displays a quiz performance rating calculated as the average percentage across all of that student's quiz attempts, divided by 20 to give a 0–5 rating. It also shows a trophy badge: no attempts display a grayscale trophy; Bronze requires more than 5 attempts; Silver requires more than 10 attempts and at least 60% average; Gold requires more than 20 attempts and at least 75%; Diamond requires more than 30 attempts and at least 90%. The next milestone is shown on the dashboard. Lecturers can manage course content and quizzes, review submissions, and return grades and feedback. Student dashboards show upcoming assignment deadlines and recent quiz results.
 
 ### 2. Configure the website's database connection
 
@@ -132,21 +136,34 @@ Do not use **Open > Project/Solution** for this folder; it has no `.sln` or `.cs
 
 Select **IIS Express** in the Visual Studio run target, then press **F5** to run with debugging or **Ctrl+F5** to run without debugging. Visual Studio opens the site at a local `http://localhost:<port>/` address. The chosen port may differ between runs. Use the URL shown by Visual Studio, then navigate from the home page. The home page loads its featured courses and course count through `App_Code/DBHelper.cs`, so if it displays those database-backed values without an error, the website has connected successfully.
 
-Sign in with a demo account below to open that role's workspace. For a quick database write check, sign in as Lecturer and create a temporary course in **Manage Courses**; confirm it appears in the catalog, then remove it. Student pages such as quizzes and assignments require enrollment in the selected course.
+Sign in with the Student demo account below and select **My Quizzes** in the left workspace navigation. Choose a subject (for example, Networking & Infrastructure) or a course from the filters, then choose **Start quiz**, answer the multiple-choice questions, and submit for an automatic score. Attempts, latest scores, and the average 0–5 performance rating appear in the quiz center/dashboard. Students must enroll in a course before its quizzes appear. Students can also give classmates written feedback and a 1–5 rating under **Peer Review**; only eligible submissions from courses both students share are listed, and students cannot review their own work or review the same submission twice. For a quick database write check, sign in as Lecturer and create a temporary course in **Manage Courses**; confirm it appears in the catalog, then remove it.
 
 To stop the site, select **Debug > Stop Debugging** or press **Shift+F5**. Keep MySQL Server running while using pages that read or write database data.
 
 ## Demo sign-in accounts
 
-The SQL setup script inserts sample accounts with the password `Password123`:
+The schema script inserts the Admin, original Lecturer, and Student sample accounts. Running `Database/seed_modern_courses.sql` also adds three named demo lecturers so courses can be distributed among instructors. All sample accounts use the password `Password123`:
 
 | Role | Email |
 | --- | --- |
 | Admin | `admin@edunest.com` |
-| Lecturer | `lecturer@edunest.com` |
+| Lecturer — Santosh Shah | `lecturer@edunest.com` |
+| Lecturer — Prakriti Joshi | `prakriti.joshi@edunest.com` |
+| Lecturer — Nabin Shrestha | `nabin.shrestha@edunest.com` |
+| Lecturer — Asha Rai | `asha.rai@edunest.com` |
 | Student | `student@edunest.com` |
 
-New public registrations create student accounts. Staff roles are intended to be assigned by an administrator.
+New public registrations create student accounts. These are demo lecturer accounts for course ownership and role-workspace demos; other staff accounts should be assigned by an administrator.
+
+### Separate dashboards and permissions
+
+Use the demo role buttons on **Login.aspx** to fill a sample email and password, or enter an account manually. Click **Log In**; EduNest reads the role saved on that account and opens its dashboard:
+
+- **Student** → `StudentDashboard.aspx`: own enrolled courses, topic progress, quizzes/achievements, assignment deadlines, and peer reviews.
+- **Teacher (Lecturer)** → `LecturerDashboard.aspx`: only courses assigned to that lecturer, enrolled student counts, submissions, learning paths, quiz and assignment authoring, and grading.
+- **Administrator** → `AdminDashboard.aspx`: platform-wide user, course, enrollment, quiz-attempt and pending-review totals, plus user/content management.
+
+The sidebar also changes by role. A user who manually visits another role's protected dashboard is redirected to their own dashboard. Students can register publicly; lecturer and administrator roles must be assigned by an administrator (the extra lecturer accounts above are pre-seeded demos).
 
 ## Troubleshooting
 

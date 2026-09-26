@@ -9,41 +9,44 @@
     </asp:Panel>
 
     <!-- ============ INSERT ============ -->
-    <div class="form-panel" style="max-width:100%; margin-bottom:30px;">
+    <div class="form-panel user-create-panel">
         <h2>Create User Account</h2>
-        <div class="form-group">
-            <label>Full Name</label>
-            <asp:TextBox ID="txtFullName" runat="server" />
-            <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFullName" ValidationGroup="Insert"
-                CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" />
-            <asp:RequiredFieldValidator runat="server" ControlToValidate="txtEmail" ValidationGroup="Insert"
-                CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
-            <asp:RegularExpressionValidator runat="server" ControlToValidate="txtEmail" ValidationGroup="Insert"
-                ValidationExpression="^[^\s@]+@[^\s@]+\.[^\s@]+$" CssClass="field-error" ErrorMessage="Invalid email." Display="Dynamic" />
-        </div>
-        <div class="form-group">
-            <label>Temporary Password</label>
-            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
-            <asp:RequiredFieldValidator runat="server" ControlToValidate="txtPassword" ValidationGroup="Insert"
-                CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
-        </div>
-        <div class="form-group">
-            <label>Role</label>
-            <asp:DropDownList ID="ddlRole" runat="server">
-                <asp:ListItem Text="Student" Value="Student" />
-                <asp:ListItem Text="Lecturer" Value="Lecturer" />
-                <asp:ListItem Text="Admin" Value="Admin" />
-            </asp:DropDownList>
+        <div class="user-create-fields">
+            <div class="form-group">
+                <label>Full Name</label>
+                <asp:TextBox ID="txtFullName" runat="server" />
+                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFullName" ValidationGroup="Insert"
+                    CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" />
+                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtEmail" ValidationGroup="Insert"
+                    CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
+                <asp:RegularExpressionValidator runat="server" ControlToValidate="txtEmail" ValidationGroup="Insert"
+                    ValidationExpression="^[^\s@]+@[^\s@]+\.[^\s@]+$" CssClass="field-error" ErrorMessage="Invalid email." Display="Dynamic" />
+            </div>
+            <div class="form-group">
+                <label>Temporary Password</label>
+                <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" />
+                <asp:RequiredFieldValidator runat="server" ControlToValidate="txtPassword" ValidationGroup="Insert"
+                    CssClass="field-error" ErrorMessage="Required." Display="Dynamic" />
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <asp:DropDownList ID="ddlRole" runat="server">
+                    <asp:ListItem Text="Student" Value="Student" />
+                    <asp:ListItem Text="Lecturer" Value="Lecturer" />
+                    <asp:ListItem Text="Admin" Value="Admin" />
+                </asp:DropDownList>
+            </div>
         </div>
         <asp:Button ID="btnAdd" runat="server" Text="Create User" CssClass="btn btn-accent" ValidationGroup="Insert" OnClick="btnAdd_Click" />
     </div>
 
     <!-- ============ DISPLAY / UPDATE / DELETE ============ -->
-    <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="false" CssClass="data-table"
+    <div class="users-table-scroll">
+    <asp:GridView ID="gvUsers" runat="server" AutoGenerateColumns="false" CssClass="data-table users-data-table"
         DataKeyNames="UserID" OnRowEditing="gvUsers_RowEditing" OnRowCancelingEdit="gvUsers_RowCancelingEdit"
         OnRowUpdating="gvUsers_RowUpdating" OnRowDeleting="gvUsers_RowDeleting" OnRowDataBound="gvUsers_RowDataBound">
         <Columns>
@@ -66,5 +69,6 @@
             <asp:CommandField ShowEditButton="true" ShowDeleteButton="true" ButtonType="Button" />
         </Columns>
     </asp:GridView>
+    </div>
 
 </asp:Content>

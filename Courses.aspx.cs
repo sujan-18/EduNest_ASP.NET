@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
 using EduNest.App_Code;
@@ -18,7 +19,11 @@ public partial class Courses : System.Web.UI.Page
                               EXISTS(SELECT 1 FROM Enrollments e WHERE e.CourseID = c.CourseID AND e.StudentID = @StudentID) AS IsEnrolled
                         FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
                         ORDER BY c.Category, c.Title";
-        rptCourses.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        DataTable courses = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        courses.Columns.Add("ImagePath", typeof(string));
+        foreach (DataRow course in courses.Rows)
+            course["ImagePath"] = ResolveUrl(CourseVisualHelper.GetImagePath(course["Category"].ToString()));
+        rptCourses.DataSource = courses;
         rptCourses.DataBind();
     }
 

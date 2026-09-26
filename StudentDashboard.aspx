@@ -7,10 +7,17 @@
             <a class="btn btn-primary" href="Courses.aspx">&#43; Explore courses</a>
         </section>
 
+        <section class="achievement-profile" aria-label="Quiz achievement">
+            <span id="achievementMedal" runat="server" class="achievement-medal is-locked"><asp:Literal ID="litAchievementEmoji" runat="server" /></span>
+            <div class="achievement-copy"><span class="eyebrow">QUIZ ACHIEVEMENT</span><h2><asp:Literal ID="litAchievementTitle" runat="server" /></h2><p><asp:Literal ID="litAchievementDetail" runat="server" /></p></div>
+            <div class="achievement-next"><small>UP NEXT</small><strong><asp:Literal ID="litAchievementNext" runat="server" /></strong></div>
+        </section>
+
         <div class="stat-grid student-stats">
-            <div class="stat-card"><span class="stat-icon">&#9635;</span><div><strong><asp:Literal ID="litEnrolledCount" runat="server" /></strong><small>Enrolled courses</small></div></div>
-            <div class="stat-card"><span class="stat-icon stat-icon-gold">&#10003;</span><div><strong><asp:Literal ID="litCompletedCount" runat="server" /></strong><small>Topics completed</small></div></div>
-            <div class="stat-card"><span class="stat-icon stat-icon-teal">&#9733;</span><div><strong><asp:Literal ID="litAttemptCount" runat="server" /></strong><small>Quiz attempts</small></div></div>
+            <div class="stat-card"><span class="stat-icon"><svg aria-hidden="true"><use href="#icon-course" /></svg></span><div><strong><asp:Literal ID="litEnrolledCount" runat="server" /></strong><small>Enrolled courses</small></div></div>
+            <div class="stat-card"><span class="stat-icon stat-icon-gold"><svg aria-hidden="true"><use href="#icon-check" /></svg></span><div><strong><asp:Literal ID="litCompletedCount" runat="server" /></strong><small>Topics completed</small></div></div>
+            <div class="stat-card"><span class="stat-icon stat-icon-teal"><svg aria-hidden="true"><use href="#icon-quiz" /></svg></span><div><strong><asp:Literal ID="litAttemptCount" runat="server" /></strong><small>Quiz attempts</small></div></div>
+            <div class="stat-card"><span class="stat-icon stat-icon-gold"><svg aria-hidden="true"><use href="#icon-star" /></svg></span><div><strong><asp:Literal ID="litQuizRating" runat="server" /></strong><small>Quiz performance rating</small><small><asp:Literal ID="litQuizRatingDetail" runat="server" /></small></div></div>
         </div>
 
         <div class="dashboard-columns">

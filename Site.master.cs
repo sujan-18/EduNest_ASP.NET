@@ -16,10 +16,11 @@ public partial class SiteMaster : System.Web.UI.MasterPage
         phAppTopbar.Visible = true;
 
         string name = Session["FullName"] as string ?? "EduNest member";
+        string roleLabel = role == "Lecturer" ? "Teacher" : role;
         lblSidebarName.Text = Server.HtmlEncode(name);
         lblTopbarName.Text = Server.HtmlEncode(name);
-        lblSidebarRole.Text = Server.HtmlEncode(role);
-        lblTopbarRole.Text = Server.HtmlEncode(role);
+        lblSidebarRole.Text = Server.HtmlEncode(roleLabel);
+        lblTopbarRole.Text = Server.HtmlEncode(roleLabel);
 
         string[] words = name.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         string initials = words.Length == 0 ? "EN" : words[0].Substring(0, 1).ToUpperInvariant();

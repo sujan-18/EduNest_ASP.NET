@@ -10,7 +10,7 @@
         <div class="catalog-search"><label for="courseSearch">Search courses</label><input id="courseSearch" type="search" placeholder="Try React, AI, cloud, or design" autocomplete="off" /></div>
         <div><label for="categoryFilter">Subject</label><select id="categoryFilter">
             <option value="">All subjects</option><option>Web Development</option><option>AI &amp; Machine Learning</option>
-            <option>Data &amp; Analytics</option><option>Cloud &amp; DevOps</option><option>Cybersecurity</option>
+            <option>Data &amp; Analytics</option><option>Networking &amp; Infrastructure</option><option>Cloud &amp; DevOps</option><option>Cybersecurity</option>
             <option>Mobile Development</option><option>Product Design</option><option>Web3 &amp; Blockchain</option>
         </select></div>
         <div><label for="levelFilter">Level</label><select id="levelFilter"><option value="">All levels</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
@@ -23,7 +23,7 @@
         <HeaderTemplate><div class="course-grid" id="courseGrid"></HeaderTemplate>
         <ItemTemplate>
             <article class="course-card catalog-course-card" data-course-title='<%#: Eval("Title") %>' data-course-category='<%#: Eval("Category") %>' data-course-level='<%#: Eval("Level") %>' data-course-hours='<%#: Eval("EstimatedHours") %>'>
-                <div class="course-cover"><span class="cover-orbit"></span><span class="cover-code"><%#: Eval("Category") %></span><span class="cover-symbol">&#9998;</span></div>
+                <div class="course-cover"><img class="course-art" src='<%#: Eval("ImagePath") %>' alt="Illustration for <%#: Eval("Category") %>" loading="lazy" /><span class="cover-code"><%#: Eval("Category") %></span><span class="cover-symbol" aria-hidden="true">&#8599;</span></div>
                 <div class="course-info">
                     <span class="course-label"><%#: Eval("Category") %></span>
                     <h3><%#: Eval("Title") %></h3>

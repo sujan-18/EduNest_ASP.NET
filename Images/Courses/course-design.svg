@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Product design course illustration</title><desc id="desc">A colorful interface design board with a sample product layout.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#7c4b76"/><stop offset="1" stop-color="#d48d66"/></linearGradient></defs><rect width="640" height="360" rx="28" fill="url(#bg)"/>
+  <rect x="97" y="58" width="446" height="248" rx="18" fill="#fffaf5"/><rect x="97" y="58" width="446" height="35" rx="18" fill="#f0e7e1"/><path d="M97 76v17h446V76" fill="#f0e7e1"/>
+  <circle cx="120" cy="75" r="5" fill="#e78372"/><circle cx="138" cy="75" r="5" fill="#efbf62"/><circle cx="156" cy="75" r="5" fill="#73b89c"/>
+  <rect x="124" y="116" width="142" height="160" rx="13" fill="#e8e3fb"/><circle cx="195" cy="166" r="31" fill="#9a8bd4"/><rect x="150" y="210" width="91" height="9" rx="4" fill="#71658d"/><rect x="150" y="229" width="65" height="6" rx="3" fill="#b2a9c5"/>
+  <rect x="290" y="119" width="221" height="21" rx="9" fill="#273a53"/><rect x="290" y="151" width="178" height="8" rx="4" fill="#c9c3bf"/><rect x="290" y="168" width="201" height="8" rx="4" fill="#ded9d5"/><rect x="290" y="204" width="92" height="47" rx="12" fill="#e9a35b"/><rect x="393" y="204" width="92" height="47" rx="12" fill="#73b89c"/>
+  <path d="m504 252 44 39 4-22 20-8-68-9Z" fill="#fff" stroke="#6b5271" stroke-width="4" stroke-linejoin="round"/>
+</svg>

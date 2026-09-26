@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Cybersecurity course illustration</title><desc id="desc">A protected shield with a secure checkmark over a dark background.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#182a4d"/><stop offset="1" stop-color="#6d477f"/></linearGradient><linearGradient id="shield" x2="1" y2="1"><stop stop-color="#f6cc73"/><stop offset="1" stop-color="#e88b68"/></linearGradient></defs>
+  <rect width="640" height="360" rx="28" fill="url(#bg)"/><g fill="none" stroke="#fff" stroke-opacity=".12"><circle cx="330" cy="180" r="145"/><circle cx="330" cy="180" r="112"/></g>
+  <path d="M320 73 426 111v67c0 66-43 104-106 132-63-28-106-66-106-132v-67l106-38Z" fill="url(#shield)"/>
+  <path d="m273 184 32 32 68-75" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="65" y="54" width="157" height="40" rx="20" fill="#fff" fill-opacity=".12"/><text x="91" y="80" fill="#fff2dc" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="2">SECURITY</text>
+  <circle cx="496" cy="84" r="6" fill="#f3bd62"/><circle cx="521" cy="112" r="4" fill="#92dfd4"/><circle cx="129" cy="276" r="5" fill="#92dfd4"/>
+</svg>

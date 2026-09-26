@@ -7,6 +7,12 @@ public partial class Login : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (!IsPostBack && AuthHelper.IsKnownRole(Session["Role"] as string))
+        {
+            Response.Redirect(AuthHelper.DashboardForRole(Session["Role"] as string));
+            return;
+        }
+        if (!IsPostBack && Session["Role"] != null) Session.Clear();
         if (!IsPostBack && Request.QueryString["registered"] == "1")
         {
             pnlSuccess.Visible = true;
@@ -64,18 +70,7 @@ public partial class Login : System.Web.UI.Page
         Session["FullName"] = row["FullName"].ToString();
         Session["Role"] = row["Role"].ToString();
 
-        switch (row["Role"].ToString())
-        {
-            case "Admin":
-                Response.Redirect("AdminDashboard.aspx");
-                break;
-            case "Lecturer":
-                Response.Redirect("LecturerDashboard.aspx");
-                break;
-            default:
-                Response.Redirect("StudentDashboard.aspx");
-                break;
-        }
+        Response.Redirect(AuthHelper.DashboardForRole(row["Role"].ToString()));
     }
 
     private void ShowError(string message)

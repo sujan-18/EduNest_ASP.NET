@@ -25,7 +25,7 @@ validation controls on validated forms, and clean file organization.
    to run again.
 4. Run `Database/upgrade_data_constraints.sql` to add database-level validation
    checks. This migration is safe to run again.
-5. Run `Database/seed_modern_courses.sql` to add ten technology courses with
+5. Run `Database/seed_modern_courses.sql` to add eleven technology courses with
    learning topics, quizzes, questions, and practical assignments. It can be
    rerun without duplicating the catalog.
 6. For app connections, use `Database/create_app_user.sql`: replace its password
@@ -34,10 +34,15 @@ validation controls on validated forms, and clean file organization.
 
 ### Demo accounts (all use the password `Password123`)
 
+The course seed creates three additional lecturer accounts and assigns courses across the instructor team.
+
 | Role      | Email                  |
 |-----------|------------------------|
 | Admin     | admin@edunest.com      |
-| Lecturer  | lecturer@edunest.com   |
+| Lecturer — Santosh Shah | lecturer@edunest.com |
+| Lecturer — Prakriti Joshi | prakriti.joshi@edunest.com |
+| Lecturer — Nabin Shrestha | nabin.shrestha@edunest.com |
+| Lecturer — Asha Rai | asha.rai@edunest.com |
 | Student   | student@edunest.com    |
 
 ## 3. Open the project in Visual Studio
@@ -118,7 +123,10 @@ student photo so the image loads without a remote request.
 | HTML5 elements                             | Semantic markup across all `.aspx` pages (`<header>`, `<main>`, `<footer>`, `<nav>`) |
 | External / internal / inline CSS           | `Content/site.css` (external); inline `style=""` used sparingly on a few elements |
 | Database connectivity (Insert/Display/Update/Delete) | `ManageCourses.aspx`, `ManageLearningPath.aspx`, `ManageUsers.aspx`, `ManageQuizzes.aspx`, `ManageAssignments.aspx`, `StudyScheduler.aspx` |
-| Modern technology courses | Ten seeded tracks with learning paths, quizzes, and assignments; searchable and filterable catalog |
+| Modern technology courses | Eleven seeded tracks with learning paths, quizzes, and assignments; searchable and filterable catalog |
+| Student quiz center and performance rating | `MyQuizzes.aspx` filters enrolled-course quizzes; dashboard computes an average-attempt rating from 0 to 5 |
+| Student reviews | `PeerReview.aspx` lets students review eligible classmates' assignment submissions with written feedback and a 1–5 rating |
+| Separate role dashboards | Login redirects Student, Lecturer/Teacher, and Admin accounts to their own dashboard; role guards and navigation keep their workspaces separate |
 | Assignment review | Lecturers/admins grade submissions and return written feedback to students |
 | Registration page                          | `Register.aspx` |
 | Registered member modules                  | `StudentDashboard.aspx`, `LecturerDashboard.aspx`, plus all Manage* pages for lecturers |

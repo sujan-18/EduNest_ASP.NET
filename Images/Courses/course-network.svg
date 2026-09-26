@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Computer networking course illustration</title><desc id="desc">Connected network nodes and data paths across a blue background.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0b315f"/><stop offset="1" stop-color="#168f9a"/></linearGradient></defs>
+  <rect width="640" height="360" rx="28" fill="url(#bg)"/><g stroke="#8be9e2" stroke-opacity=".58" stroke-width="4"><path d="M143 104 284 167 451 91M143 104l40 153 101-90 119 129 48-205M183 257l171 62 70-60m-70-92-70 152"/></g>
+  <g fill="#f6fffd" stroke="#7be5df" stroke-width="7"><circle cx="143" cy="104" r="17"/><circle cx="284" cy="167" r="20"/><circle cx="451" cy="91" r="17"/><circle cx="183" cy="257" r="17"/><circle cx="354" cy="319" r="17"/><circle cx="473" cy="259" r="17"/></g>
+  <rect x="63" y="44" width="161" height="39" rx="19" fill="#fff" fill-opacity=".14"/><text x="86" y="70" fill="#e4fffd" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="2">NETWORK LAB</text>
+  <circle cx="284" cy="167" r="47" fill="none" stroke="#ecfbff" stroke-opacity=".25" stroke-width="2"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Artificial intelligence course illustration</title><desc id="desc">A glowing neural network diagram on a deep violet background.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#24195f"/><stop offset="1" stop-color="#087c94"/></linearGradient><radialGradient id="glow"><stop stop-color="#8bf4ee" stop-opacity=".7"/><stop offset="1" stop-color="#8bf4ee" stop-opacity="0"/></radialGradient></defs>
+  <rect width="640" height="360" rx="28" fill="url(#bg)"/><circle cx="430" cy="170" r="170" fill="url(#glow)"/>
+  <g stroke="#a6f3ef" stroke-opacity=".55" stroke-width="3"><path d="m250 112 97 63-93 76 167-139m-167 139 167-139m-167 139 94-76 73 72m-171-135 171 135m-74-72 74-72"/></g>
+  <g fill="#e7fffc" stroke="#67e4dd" stroke-width="5"><circle cx="250" cy="112" r="14"/><circle cx="347" cy="175" r="14"/><circle cx="254" cy="251" r="14"/><circle cx="421" cy="112" r="14"/><circle cx="421" cy="251" r="14"/><circle cx="421" cy="112" r="14"/></g>
+  <rect x="69" y="63" width="145" height="41" rx="20" fill="#ffffff" fill-opacity=".13"/><text x="93" y="90" fill="#d9fffa" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="3">MACHINE LEARNING</text>
+  <path d="M93 152h82m-82 23h52m-52 23h68" stroke="#c7d1ff" stroke-width="6" stroke-linecap="round" opacity=".72"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Blockchain development course illustration</title><desc id="desc">Linked translucent blocks represent a decentralized ledger.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#253d77"/><stop offset="1" stop-color="#7156aa"/></linearGradient><linearGradient id="block" x2="1" y2="1"><stop stop-color="#c9b5ff" stop-opacity=".96"/><stop offset="1" stop-color="#80e2dd" stop-opacity=".83"/></linearGradient></defs><rect width="640" height="360" rx="28" fill="url(#bg)"/>
+  <g stroke="#f1edff" stroke-opacity=".62" stroke-width="4"><path d="M222 171h65m67 0h65M255 226l47-35m83-20 44-29m-118 93v-28"/></g>
+  <g fill="url(#block)" stroke="#fff" stroke-opacity=".85" stroke-width="3"><rect x="157" y="130" width="68" height="82" rx="12"/><rect x="287" y="130" width="68" height="82" rx="12"/><rect x="417" y="130" width="68" height="82" rx="12"/><rect x="255" y="226" width="68" height="82" rx="12"/><rect x="440" y="75" width="68" height="82" rx="12"/></g>
+  <g fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"><path d="m174 155 17-10 17 10v23l-17 10-17-10v-23Z"/><path d="m304 155 17-10 17 10v23l-17 10-17-10v-23Z"/><path d="m434 155 17-10 17 10v23l-17 10-17-10v-23Z"/></g>
+</svg>

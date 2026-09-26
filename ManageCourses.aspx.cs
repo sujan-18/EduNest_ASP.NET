@@ -149,7 +149,7 @@ public partial class ManageCourses : System.Web.UI.Page
 
     private bool TryReadCourseMetadata(string category, string level, string hoursText, out int estimatedHours)
     {
-        string[] allowedCategories = { "Web Development", "AI & Machine Learning", "Data & Analytics", "Cloud & DevOps", "Cybersecurity", "Mobile Development", "Product Design", "Web3 & Blockchain" };
+        string[] allowedCategories = { "Web Development", "AI & Machine Learning", "Data & Analytics", "Networking & Infrastructure", "Cloud & DevOps", "Cybersecurity", "Mobile Development", "Product Design", "Web3 & Blockchain" };
         string[] allowedLevels = { "Beginner", "Intermediate", "Advanced" };
         bool validHours = Int32.TryParse(hoursText, out estimatedHours) && estimatedHours >= 1 && estimatedHours <= 200;
         return Array.IndexOf(allowedCategories, category) >= 0 && Array.IndexOf(allowedLevels, level) >= 0 && validHours;

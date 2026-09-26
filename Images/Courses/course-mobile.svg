@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Mobile app development course illustration</title><desc id="desc">A modern mobile phone interface surrounded by app cards.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#623f91"/><stop offset="1" stop-color="#c36e91"/></linearGradient></defs><rect width="640" height="360" rx="28" fill="url(#bg)"/>
+  <rect x="259" y="37" width="143" height="286" rx="29" fill="#202443"/><rect x="269" y="52" width="123" height="256" rx="20" fill="#fbf8ff"/><rect x="305" y="61" width="51" height="8" rx="4" fill="#d9d2e6"/>
+  <rect x="284" y="89" width="93" height="76" rx="16" fill="#e8dafa"/><circle cx="330" cy="127" r="23" fill="#a082d5"/><path d="M318 128h24m-12-12v24" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <rect x="284" y="179" width="93" height="14" rx="7" fill="#292d4e"/><rect x="284" y="202" width="68" height="8" rx="4" fill="#c7c3d3"/><rect x="284" y="225" width="93" height="42" rx="12" fill="#42a995"/><text x="305" y="251" fill="#fff" font-family="Arial,sans-serif" font-size="12" font-weight="700">CONTINUE</text>
+  <rect x="112" y="108" width="89" height="89" rx="21" fill="#fff" fill-opacity=".18"/><path d="m135 153 18-18 23 23" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="444" y="169" width="82" height="82" rx="20" fill="#ffe4bd"/><circle cx="485" cy="210" r="21" fill="#f0ad61"/><path d="M476 210h18m-9-9v18" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+</svg>

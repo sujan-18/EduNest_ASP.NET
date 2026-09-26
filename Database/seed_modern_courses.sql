@@ -3,34 +3,57 @@
 -- Run after edunest_schema.sql and upgrade_platform_features.sql.
 USE edunest_db;
 
+-- Add demo lecturers used to distribute course ownership. Their password is
+-- the same Password123 demo hash as lecturer@edunest.com.
+INSERT INTO Users (FullName, Email, PasswordHash, PasswordSalt, Role)
+SELECT 'Prakriti Joshi', 'prakriti.joshi@edunest.com', 'Ke3X5//FlBieE4tzLe54qmxfJX6dvUXz0dqzH1Ne71g=', 'demoSalt123', 'Lecturer'
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'prakriti.joshi@edunest.com');
+INSERT INTO Users (FullName, Email, PasswordHash, PasswordSalt, Role)
+SELECT 'Nabin Shrestha', 'nabin.shrestha@edunest.com', 'Ke3X5//FlBieE4tzLe54qmxfJX6dvUXz0dqzH1Ne71g=', 'demoSalt123', 'Lecturer'
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'nabin.shrestha@edunest.com');
+INSERT INTO Users (FullName, Email, PasswordHash, PasswordSalt, Role)
+SELECT 'Asha Rai', 'asha.rai@edunest.com', 'Ke3X5//FlBieE4tzLe54qmxfJX6dvUXz0dqzH1Ne71g=', 'demoSalt123', 'Lecturer'
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'asha.rai@edunest.com');
+
 CREATE TEMPORARY TABLE EduNestCourseSeed (
     CourseTitle VARCHAR(150) NOT NULL,
     CourseDescription TEXT NOT NULL,
     Category VARCHAR(60) NOT NULL,
     CourseLevel ENUM('Beginner','Intermediate','Advanced') NOT NULL,
-    EstimatedHours SMALLINT UNSIGNED NOT NULL
+    EstimatedHours SMALLINT UNSIGNED NOT NULL,
+    LecturerEmail VARCHAR(150) NOT NULL
 );
 
 INSERT INTO EduNestCourseSeed VALUES
-('Full-Stack Web Engineering with React & ASP.NET', 'Build modern web products with accessible React interfaces, REST APIs, ASP.NET, authentication, testing, and relational data.', 'Web Development', 'Intermediate', 32),
-('Applied Generative AI & LLM Applications', 'Create responsible AI features with prompt design, retrieval-augmented generation, evaluation, and secure API integration.', 'AI & Machine Learning', 'Advanced', 24),
-('Python Data Science & Analytics', 'Turn raw data into clear insights using Python, pandas, visualization, statistics, and practical machine-learning workflows.', 'Data & Analytics', 'Intermediate', 28),
-('Cloud-Native Engineering with AWS & Docker', 'Package services, design resilient cloud infrastructure, automate deployments, and monitor production workloads.', 'Cloud & DevOps', 'Intermediate', 30),
-('Cybersecurity & Ethical Hacking Essentials', 'Practice threat modeling, secure configuration, web security testing, incident response, and responsible disclosure.', 'Cybersecurity', 'Beginner', 24),
-('Cross-Platform App Development with Flutter', 'Design and ship responsive Android and iOS apps with Flutter, Dart, state management, APIs, and device testing.', 'Mobile Development', 'Intermediate', 26),
-('DevOps Automation & CI/CD', 'Build reliable delivery pipelines with Git, automated tests, containers, deployment strategies, and observability.', 'Cloud & DevOps', 'Advanced', 22),
-('UI/UX & Digital Product Design with Figma', 'Research user needs, map journeys, prototype accessible interfaces, test usability, and hand off a consistent design system.', 'Product Design', 'Beginner', 18),
-('Blockchain dApp Development with Solidity', 'Understand EVM networks, write and test smart contracts, connect wallets, and assess common contract risks.', 'Web3 & Blockchain', 'Advanced', 24),
-('Modern Database Engineering with MySQL & Redis', 'Model reliable relational data, tune queries and indexes, add caching, and plan safe schema changes.', 'Data & Analytics', 'Intermediate', 20);
+('Full-Stack Web Engineering with React & ASP.NET', 'Build modern web products with accessible React interfaces, REST APIs, ASP.NET, authentication, testing, and relational data.', 'Web Development', 'Intermediate', 32, 'lecturer@edunest.com'),
+('Applied Generative AI & LLM Applications', 'Create responsible AI features with prompt design, retrieval-augmented generation, evaluation, and secure API integration.', 'AI & Machine Learning', 'Advanced', 24, 'prakriti.joshi@edunest.com'),
+('Python Data Science & Analytics', 'Turn raw data into clear insights using Python, pandas, visualization, statistics, and practical machine-learning workflows.', 'Data & Analytics', 'Intermediate', 28, 'prakriti.joshi@edunest.com'),
+('Cloud-Native Engineering with AWS & Docker', 'Package services, design resilient cloud infrastructure, automate deployments, and monitor production workloads.', 'Cloud & DevOps', 'Intermediate', 30, 'nabin.shrestha@edunest.com'),
+('Cybersecurity & Ethical Hacking Essentials', 'Practice threat modeling, secure configuration, web security testing, incident response, and responsible disclosure.', 'Cybersecurity', 'Beginner', 24, 'nabin.shrestha@edunest.com'),
+('Cross-Platform App Development with Flutter', 'Design and ship responsive Android and iOS apps with Flutter, Dart, state management, APIs, and device testing.', 'Mobile Development', 'Intermediate', 26, 'asha.rai@edunest.com'),
+('DevOps Automation & CI/CD', 'Build reliable delivery pipelines with Git, automated tests, containers, deployment strategies, and observability.', 'Cloud & DevOps', 'Advanced', 22, 'nabin.shrestha@edunest.com'),
+('UI/UX & Digital Product Design with Figma', 'Research user needs, map journeys, prototype accessible interfaces, test usability, and hand off a consistent design system.', 'Product Design', 'Beginner', 18, 'asha.rai@edunest.com'),
+('Blockchain dApp Development with Solidity', 'Understand EVM networks, write and test smart contracts, connect wallets, and assess common contract risks.', 'Web3 & Blockchain', 'Advanced', 24, 'asha.rai@edunest.com'),
+('Modern Database Engineering with MySQL & Redis', 'Model reliable relational data, tune queries and indexes, add caching, and plan safe schema changes.', 'Data & Analytics', 'Intermediate', 20, 'prakriti.joshi@edunest.com'),
+('Computer Networking & Infrastructure Foundations', 'Learn how networks move data, configure addressing and routing, diagnose connectivity, and secure modern infrastructure.', 'Networking & Infrastructure', 'Beginner', 20, 'nabin.shrestha@edunest.com');
 
 INSERT INTO Courses (Title, Description, Category, Level, EstimatedHours, LecturerID)
 SELECT s.CourseTitle, s.CourseDescription, s.Category, s.CourseLevel, s.EstimatedHours, lecturer.UserID
 FROM EduNestCourseSeed s
-JOIN Users lecturer ON lecturer.Email = 'lecturer@edunest.com' AND lecturer.Role = 'Lecturer'
+JOIN Users lecturer ON lecturer.Email = s.LecturerEmail AND lecturer.Role = 'Lecturer'
 WHERE NOT EXISTS (
     SELECT 1 FROM Courses c
-    WHERE c.Title = s.CourseTitle AND c.LecturerID = lecturer.UserID
+    WHERE c.Title = s.CourseTitle
 );
+
+-- Move courses from the original single demo lecturer to the named course
+-- owners once; keep later manual ownership changes intact on future reruns.
+UPDATE Courses c
+JOIN EduNestCourseSeed s ON s.CourseTitle = c.Title
+JOIN Users originalLecturer ON originalLecturer.Email = 'lecturer@edunest.com'
+JOIN Users assignedLecturer ON assignedLecturer.Email = s.LecturerEmail
+SET c.LecturerID = assignedLecturer.UserID
+WHERE c.LecturerID = originalLecturer.UserID OR c.LecturerID = assignedLecturer.UserID;
 
 CREATE TEMPORARY TABLE EduNestTopicSeed (
     CourseTitle VARCHAR(150) NOT NULL,
@@ -79,13 +102,17 @@ INSERT INTO EduNestTopicSeed VALUES
 ('Modern Database Engineering with MySQL & Redis',1,'Relational modeling and normalization','Translate product requirements into keys, relationships, and consistent relational tables.'),
 ('Modern Database Engineering with MySQL & Redis',2,'SQL queries, indexes, and explain plans','Write efficient joins, inspect query plans, and add indexes based on measured access patterns.'),
 ('Modern Database Engineering with MySQL & Redis',3,'Transactions, concurrency, and caching','Protect updates with transactions, understand contention, and use cache invalidation deliberately.'),
-('Modern Database Engineering with MySQL & Redis',4,'Migrations, backups, and recovery','Plan reversible schema changes, verify backups, and practice a recovery procedure.');
+('Modern Database Engineering with MySQL & Redis',4,'Migrations, backups, and recovery','Plan reversible schema changes, verify backups, and practice a recovery procedure.'),
+('Computer Networking & Infrastructure Foundations',1,'Network models and packet flow','Trace how application data moves through network layers, switches, routers, and services.'),
+('Computer Networking & Infrastructure Foundations',2,'IP addressing and subnetting','Plan IPv4 subnets, gateways, DNS settings, and practical address ranges.'),
+('Computer Networking & Infrastructure Foundations',3,'Routing, switching, and troubleshooting','Inspect routes, isolate common connectivity faults, and verify fixes with network tools.'),
+('Computer Networking & Infrastructure Foundations',4,'Network security and cloud connectivity','Apply segmentation, secure remote access, firewall rules, and cloud network fundamentals.');
 
 INSERT INTO LearningPathTopics (CourseID, Title, Content, SequenceOrder)
 SELECT c.CourseID, s.TopicTitle, s.TopicContent, s.SequenceOrder
 FROM EduNestTopicSeed s
 JOIN Courses c ON c.Title = s.CourseTitle
-JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Email = 'lecturer@edunest.com'
+JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Role = 'Lecturer'
 WHERE NOT EXISTS (
     SELECT 1 FROM LearningPathTopics t
     WHERE t.CourseID = c.CourseID AND t.Title = s.TopicTitle
@@ -105,12 +132,13 @@ INSERT INTO EduNestQuizSeed VALUES
 ('DevOps Automation & CI/CD','DevOps Automation - Practical Check'),
 ('UI/UX & Digital Product Design with Figma','UI/UX Product Design - Practical Check'),
 ('Blockchain dApp Development with Solidity','Blockchain dApp Development - Practical Check'),
-('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check');
+('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check'),
+('Computer Networking & Infrastructure Foundations','Networking Fundamentals - Practical Check');
 
 INSERT INTO Quizzes (CourseID, Title)
 SELECT c.CourseID, s.QuizTitle FROM EduNestQuizSeed s
 JOIN Courses c ON c.Title = s.CourseTitle
-JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Email = 'lecturer@edunest.com'
+JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Role = 'Lecturer'
 WHERE NOT EXISTS (SELECT 1 FROM Quizzes q WHERE q.CourseID = c.CourseID AND q.Title = s.QuizTitle);
 
 CREATE TEMPORARY TABLE EduNestQuestionSeed (
@@ -153,14 +181,17 @@ INSERT INTO EduNestQuestionSeed VALUES
 ('Blockchain dApp Development with Solidity','Blockchain dApp Development - Practical Check','What should a dApp explain before a wallet transaction?', 'The requested action and likely network cost','The users private key','An unrelated notification','A guarantee of profit','A'),
 ('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check','What is a database transaction useful for?', 'Grouping related changes atomically','Styling a web form','Compiling JavaScript','Creating a cloud region','A'),
 ('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check','When should an index generally be added?', 'When measured query patterns justify it','For every column automatically','Only to store passwords','Whenever a table is empty','A'),
-('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check','What is an important part of a safe schema migration?', 'A tested plan for applying and recovering the change','Editing production tables without a backup','Removing all constraints','Changing data types without checking existing values','A');
+('Modern Database Engineering with MySQL & Redis','Modern Database Engineering - Practical Check','What is an important part of a safe schema migration?', 'A tested plan for applying and recovering the change','Editing production tables without a backup','Removing all constraints','Changing data types without checking existing values','A'),
+('Computer Networking & Infrastructure Foundations','Networking Fundamentals - Practical Check','Which service translates a domain name into an IP address?', 'DNS','DHCP','SSH','NTP','A'),
+('Computer Networking & Infrastructure Foundations','Networking Fundamentals - Practical Check','What is the default gateway used for?', 'Sending traffic to networks outside the local subnet','Assigning a username','Encrypting a local file','Naming a database','A'),
+('Computer Networking & Infrastructure Foundations','Networking Fundamentals - Practical Check','What is a safe first step when diagnosing a connection issue?', 'Check link status, address configuration, and reachability','Disable every firewall permanently','Share administrator passwords','Replace all network equipment','A');
 
 INSERT INTO QuizQuestions (QuizID, QuestionText, OptionA, OptionB, OptionC, OptionD, CorrectOption)
 SELECT q.QuizID, s.QuestionText, s.OptionA, s.OptionB, s.OptionC, s.OptionD, s.CorrectOption
 FROM EduNestQuestionSeed s
 JOIN EduNestQuizSeed qs ON qs.CourseTitle = s.CourseTitle AND qs.QuizTitle = s.QuizTitle
 JOIN Courses c ON c.Title = s.CourseTitle
-JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Email = 'lecturer@edunest.com'
+JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Role = 'Lecturer'
 JOIN Quizzes q ON q.CourseID = c.CourseID AND q.Title = qs.QuizTitle
 WHERE NOT EXISTS (SELECT 1 FROM QuizQuestions qq WHERE qq.QuizID = q.QuizID AND qq.QuestionText = s.QuestionText);
 
@@ -180,13 +211,14 @@ INSERT INTO EduNestAssignmentSeed VALUES
 ('DevOps Automation & CI/CD','Create a Continuous Delivery Pipeline','Automate validation and deployment for a sample service, including secrets handling, observability, and rollback.','2026-12-15'),
 ('UI/UX & Digital Product Design with Figma','Design and Validate a Digital Product Flow','Submit research notes, a user flow, an accessible prototype, usability findings, and prioritized design improvements.','2026-12-15'),
 ('Blockchain dApp Development with Solidity','Test a Secure Smart Contract dApp','Implement a small contract with automated tests, threat notes, safe wallet interaction, and clear transaction UX.','2026-12-15'),
-('Modern Database Engineering with MySQL & Redis','Model, Tune, and Migrate an App Database','Deliver a relational model, measured query improvements, a safe migration plan, and a verified backup/recovery walkthrough.','2026-12-15');
+('Modern Database Engineering with MySQL & Redis','Model, Tune, and Migrate an App Database','Deliver a relational model, measured query improvements, a safe migration plan, and a verified backup/recovery walkthrough.','2026-12-15'),
+('Computer Networking & Infrastructure Foundations','Plan and Troubleshoot a Secure Small Network','Design an addressed network diagram, document routing and DNS choices, troubleshoot sample failures, and propose practical security controls.','2026-12-15');
 
 INSERT INTO Assignments (CourseID, Title, Description, DueDate)
 SELECT c.CourseID, s.AssignmentTitle, s.AssignmentDescription, s.DueDate
 FROM EduNestAssignmentSeed s
 JOIN Courses c ON c.Title = s.CourseTitle
-JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Email = 'lecturer@edunest.com'
+JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Role = 'Lecturer'
 WHERE NOT EXISTS (SELECT 1 FROM Assignments a WHERE a.CourseID = c.CourseID AND a.Title = s.AssignmentTitle);
 
 -- Enroll the demo student so dashboards and course activities have a complete
@@ -194,7 +226,7 @@ WHERE NOT EXISTS (SELECT 1 FROM Assignments a WHERE a.CourseID = c.CourseID AND 
 INSERT INTO Enrollments (CourseID, StudentID)
 SELECT c.CourseID, student.UserID FROM EduNestCourseSeed s
 JOIN Courses c ON c.Title = s.CourseTitle
-JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Email = 'lecturer@edunest.com'
+JOIN Users lecturer ON lecturer.UserID = c.LecturerID AND lecturer.Role = 'Lecturer'
 JOIN Users student ON student.Email = 'student@edunest.com' AND student.Role = 'Student'
 WHERE NOT EXISTS (SELECT 1 FROM Enrollments e WHERE e.CourseID = c.CourseID AND e.StudentID = student.UserID);
 

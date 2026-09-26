@@ -9,6 +9,22 @@ namespace EduNest.App_Code
     /// </summary>
     public static class AuthHelper
     {
+        public static string DashboardForRole(string role)
+        {
+            switch (role)
+            {
+                case "Student": return "~/StudentDashboard.aspx";
+                case "Lecturer": return "~/LecturerDashboard.aspx";
+                case "Admin": return "~/AdminDashboard.aspx";
+                default: return "~/Login.aspx";
+            }
+        }
+
+        public static bool IsKnownRole(string role)
+        {
+            return role == "Student" || role == "Lecturer" || role == "Admin";
+        }
+
         public static bool RequireRole(Page page, params string[] allowedRoles)
         {
             object role = page.Session["Role"];
@@ -24,7 +40,7 @@ namespace EduNest.App_Code
                 if (roleStr == allowed) return true;
             }
 
-            page.Response.Redirect("~/Default.aspx");
+            page.Response.Redirect(DashboardForRole(roleStr));
             return false;
         }
 

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Web development course illustration</title><desc id="desc">A responsive web application code editor with a live preview.</desc>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#193e72"/><stop offset="1" stop-color="#5a78bd"/></linearGradient></defs><rect width="640" height="360" rx="28" fill="url(#bg)"/>
+  <rect x="93" y="59" width="454" height="244" rx="18" fill="#fbfcff"/><path d="M111 59h418a18 18 0 0 1 18 18v28H93V77a18 18 0 0 1 18-18Z" fill="#e9edf6"/>
+  <circle cx="119" cy="82" r="5" fill="#e88972"/><circle cx="137" cy="82" r="5" fill="#e6bb65"/><circle cx="155" cy="82" r="5" fill="#6bae97"/>
+  <path d="m138 148-25 21 25 21m40-42 25 21-25 21m43-43-15 44" fill="none" stroke="#536aa5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M255 132h105m-105 24h136m-136 24h93m-93 24h125" stroke="#b5bfd5" stroke-width="8" stroke-linecap="round"/>
+  <rect x="406" y="126" width="112" height="119" rx="14" fill="#e8f4ef"/><rect x="421" y="144" width="82" height="43" rx="8" fill="#aed7c8"/><rect x="421" y="198" width="51" height="8" rx="4" fill="#698c82"/><rect x="421" y="216" width="72" height="8" rx="4" fill="#bacdc7"/>
+</svg>

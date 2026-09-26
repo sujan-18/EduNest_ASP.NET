@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using EduNest.App_Code;
 
 public partial class Default : System.Web.UI.Page
@@ -19,7 +20,11 @@ public partial class Default : System.Web.UI.Page
                         JOIN Users u ON c.LecturerID = u.UserID
                         ORDER BY c.CreatedDate DESC, c.CourseID DESC
                         LIMIT 4";
-        rptFeaturedCourses.DataSource = DBHelper.ExecuteQuery(sql);
+        DataTable courses = DBHelper.ExecuteQuery(sql);
+        courses.Columns.Add("ImagePath", typeof(string));
+        foreach (DataRow course in courses.Rows)
+            course["ImagePath"] = ResolveUrl(CourseVisualHelper.GetImagePath(course["Category"].ToString()));
+        rptFeaturedCourses.DataSource = courses;
         rptFeaturedCourses.DataBind();
     }
 }
