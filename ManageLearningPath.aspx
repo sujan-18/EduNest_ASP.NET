@@ -31,6 +31,14 @@
             <label>Content</label>
             <asp:TextBox ID="txtContent" runat="server" TextMode="MultiLine" />
         </div>
+        <div class="form-group">
+            <label>Learning resource title</label>
+            <asp:TextBox ID="txtResourceTitle" runat="server" placeholder="For example: MDN HTML guide" />
+        </div>
+        <div class="form-group">
+            <label>Learning resource URL (http or https)</label>
+            <asp:TextBox ID="txtResourceUrl" runat="server" TextMode="Url" placeholder="https://..." />
+        </div>
         <asp:Button ID="btnAdd" runat="server" Text="Add Topic" CssClass="btn btn-accent" ValidationGroup="Insert" OnClick="btnAdd_Click" />
     </div>
 
@@ -51,6 +59,14 @@
             <asp:TemplateField HeaderText="Content">
                 <ItemTemplate><%#: Eval("Content") %></ItemTemplate>
                 <EditItemTemplate><asp:TextBox runat="server" ID="txtEditContent" TextMode="MultiLine" Text='<%# Bind("Content") %>' /></EditItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Resource title">
+                <ItemTemplate><%#: Eval("ResourceTitle") %></ItemTemplate>
+                <EditItemTemplate><asp:TextBox runat="server" ID="txtEditResourceTitle" Text='<%# Bind("ResourceTitle") %>' /></EditItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Resource URL">
+                <ItemTemplate><%#: Eval("ResourceUrl") %></ItemTemplate>
+                <EditItemTemplate><asp:TextBox runat="server" ID="txtEditResourceUrl" TextMode="Url" Text='<%# Bind("ResourceUrl") %>' /></EditItemTemplate>
             </asp:TemplateField>
             <asp:CommandField ShowEditButton="true" ShowDeleteButton="true" ButtonType="Button" />
         </Columns>

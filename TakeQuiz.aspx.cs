@@ -1,7 +1,7 @@
 using System;
 using System.Data;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class TakeQuiz : System.Web.UI.Page
@@ -21,32 +21,30 @@ public partial class TakeQuiz : System.Web.UI.Page
             return;
         }
 
-        if (!IsPostBack)
+        object enrolled = DBHelper.ExecuteScalar(
+            @"SELECT COUNT(*) FROM Quizzes q JOIN Enrollments e ON e.CourseID = q.CourseID
+              WHERE q.QuizID = @QuizID AND e.StudentID = @StudentID",
+            new SqlParameter("@QuizID", quizId),
+            new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+        if (Convert.ToInt32(enrolled) == 0)
         {
-            object enrolled = DBHelper.ExecuteScalar(
-                @"SELECT COUNT(*) FROM Quizzes q JOIN Enrollments e ON e.CourseID = q.CourseID
-                  WHERE q.QuizID = @QuizID AND e.StudentID = @StudentID",
-                new MySqlParameter("@QuizID", QuizID),
-                new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
-            if (Convert.ToInt32(enrolled) == 0)
-            {
-                Response.Redirect("Courses.aspx");
-                return;
-            }
-            object title = DBHelper.ExecuteScalar("SELECT Title FROM Quizzes WHERE QuizID = @QuizID",
-                new MySqlParameter("@QuizID", QuizID));
-            litQuizTitle.Text = title != null ? Server.HtmlEncode(title.ToString()) : "Quiz";
-
-            var dt = DBHelper.ExecuteQuery(
-                "SELECT QuestionID, QuestionText, OptionA, OptionB, OptionC, OptionD FROM QuizQuestions WHERE QuizID = @QuizID ORDER BY QuestionID",
-                new MySqlParameter("@QuizID", QuizID));
-
-            rptQuestions.DataSource = dt;
-            rptQuestions.DataBind();
-
-            // Keep the correct-answer key available across the postback without exposing it to the client
-            ViewState["QuestionCount"] = dt.Rows.Count;
+            Response.Redirect("Courses.aspx");
+            return;
         }
+
+        // Recreate the Repeater and its answer controls on every request so
+        // posted radio selections are restored before the submit handler scores them.
+        object title = DBHelper.ExecuteScalar("SELECT Title FROM Quizzes WHERE QuizID = @QuizID",
+            new SqlParameter("@QuizID", quizId));
+        litQuizTitle.Text = title != null ? Server.HtmlEncode(title.ToString()) : "Quiz";
+
+        DataTable dt = DBHelper.ExecuteQuery(
+            "SELECT QuestionID, QuestionText, OptionA, OptionB, OptionC, OptionD FROM QuizQuestions WHERE QuizID = @QuizID ORDER BY QuestionID",
+            new SqlParameter("@QuizID", quizId));
+        rptQuestions.DataSource = dt;
+        rptQuestions.DataBind();
+        pnlNoQuestions.Visible = dt.Rows.Count == 0;
+        btnSubmit.Visible = dt.Rows.Count > 0;
     }
 
     protected void rptQuestions_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -68,12 +66,12 @@ public partial class TakeQuiz : System.Web.UI.Page
         object enrolled = DBHelper.ExecuteScalar(
             @"SELECT COUNT(*) FROM Quizzes q JOIN Enrollments e ON e.CourseID = q.CourseID
               WHERE q.QuizID = @QuizID AND e.StudentID = @StudentID",
-            new MySqlParameter("@QuizID", QuizID), new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@QuizID", QuizID), new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
         if (Convert.ToInt32(enrolled) == 0) { Response.Redirect("Courses.aspx"); return; }
 
         DataTable answerKey = DBHelper.ExecuteQuery(
             "SELECT QuestionID, CorrectOption FROM QuizQuestions WHERE QuizID = @QuizID ORDER BY QuestionID",
-            new MySqlParameter("@QuizID", QuizID));
+            new SqlParameter("@QuizID", QuizID));
 
         int score = 0;
         int total = answerKey.Rows.Count;
@@ -93,10 +91,10 @@ public partial class TakeQuiz : System.Web.UI.Page
 
         DBHelper.ExecuteNonQuery(
             "INSERT INTO QuizAttempts (QuizID, StudentID, Score, TotalQuestions) VALUES (@QuizID, @StudentID, @Score, @Total)",
-            new MySqlParameter("@QuizID", QuizID),
-            new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)),
-            new MySqlParameter("@Score", score),
-            new MySqlParameter("@Total", total));
+            new SqlParameter("@QuizID", QuizID),
+            new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)),
+            new SqlParameter("@Score", score),
+            new SqlParameter("@Total", total));
 
         ViewState["Submitted"] = true;
 

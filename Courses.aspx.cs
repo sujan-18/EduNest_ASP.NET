@@ -1,7 +1,7 @@
 using System;
 using System.Data;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class Courses : System.Web.UI.Page
@@ -16,10 +16,10 @@ public partial class Courses : System.Web.UI.Page
         int studentId = IsStudent() ? AuthHelper.CurrentUserId(this) : 0;
         string sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours,
                               u.FullName AS LecturerName,
-                              EXISTS(SELECT 1 FROM Enrollments e WHERE e.CourseID = c.CourseID AND e.StudentID = @StudentID) AS IsEnrolled
+                              CASE WHEN EXISTS(SELECT 1 FROM Enrollments e WHERE e.CourseID = c.CourseID AND e.StudentID = @StudentID) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsEnrolled
                         FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
                         ORDER BY c.Category, c.Title";
-        DataTable courses = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        DataTable courses = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         courses.Columns.Add("ImagePath", typeof(string));
         foreach (DataRow course in courses.Rows)
             course["ImagePath"] = ResolveUrl(CourseVisualHelper.GetImagePath(course["Category"].ToString()));
@@ -45,11 +45,12 @@ public partial class Courses : System.Web.UI.Page
         int courseId = Convert.ToInt32(e.CommandArgument);
         int studentId = AuthHelper.CurrentUserId(this);
 
-        // INSERT IGNORE relies on the UNIQUE KEY (CourseID, StudentID) to avoid duplicate enrollment
+        // Avoid duplicate enrollments using the unique (CourseID, StudentID) key.
         DBHelper.ExecuteNonQuery(
-            "INSERT IGNORE INTO Enrollments (CourseID, StudentID) VALUES (@CourseID, @StudentID)",
-            new MySqlParameter("@CourseID", courseId),
-            new MySqlParameter("@StudentID", studentId));
+            @"IF NOT EXISTS (SELECT 1 FROM Enrollments WHERE CourseID = @CourseID AND StudentID = @StudentID)
+              INSERT INTO Enrollments (CourseID, StudentID) VALUES (@CourseID, @StudentID)",
+            new SqlParameter("@CourseID", courseId),
+            new SqlParameter("@StudentID", studentId));
 
         Response.Redirect("StudentDashboard.aspx");
     }

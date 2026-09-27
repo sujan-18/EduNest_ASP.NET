@@ -1,6 +1,6 @@
 using System;
 using EduNest.App_Code;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 
 public partial class MyQuizzes : System.Web.UI.Page
 {
@@ -12,10 +12,10 @@ public partial class MyQuizzes : System.Web.UI.Page
         string sql = @"SELECT q.QuizID, q.Title, c.Title AS CourseTitle, c.Category,
                               COUNT(DISTINCT qq.QuestionID) AS QuestionCount,
                               COUNT(DISTINCT qa.AttemptID) AS AttemptCount,
-                              (SELECT CONCAT(a.Score, '/', a.TotalQuestions)
+                              (SELECT TOP 1 CONCAT(a.Score, '/', a.TotalQuestions)
                                FROM QuizAttempts a
                                WHERE a.QuizID = q.QuizID AND a.StudentID = @StudentID
-                               ORDER BY a.AttemptDate DESC, a.AttemptID DESC LIMIT 1) AS LatestScore
+                               ORDER BY a.AttemptDate DESC, a.AttemptID DESC) AS LatestScore
                        FROM Enrollments e
                        JOIN Courses c ON c.CourseID = e.CourseID
                        JOIN Quizzes q ON q.CourseID = c.CourseID
@@ -25,7 +25,7 @@ public partial class MyQuizzes : System.Web.UI.Page
                        GROUP BY q.QuizID, q.Title, c.Title, c.Category
                        ORDER BY c.Title, q.Title";
         rptQuizzes.DataSource = DBHelper.ExecuteQuery(sql,
-            new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
         rptQuizzes.DataBind();
         pnlNoQuizzes.Visible = rptQuizzes.Items.Count == 0;
     }

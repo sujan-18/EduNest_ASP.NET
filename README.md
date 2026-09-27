@@ -1,40 +1,31 @@
 # EduNest — A Smart Campus Learning Hub
-### CT050-3-2-WAPP Group Assignment (ASP.NET Web Forms + MySQL)
+### CT050-3-2-WAPP Group Assignment (ASP.NET Web Forms + SQL Server LocalDB)
 
 This is the full source code for EduNest, built to satisfy the assignment's
 requirements: interlinked pages, HTML5, CSS (external/internal/inline),
 CRUD for the main academic modules, registration, three login levels
 (Student / Lecturer / Admin), server-side checks with ASP.NET client
 validation controls on validated forms, and clean file organization.
+Students can enroll in courses, follow ordered lessons, track completion, take
+course quizzes, and submit or update a course rating and feedback.
 
 ## 1. Prerequisites
 
 - **Visual Studio 2019/2022** with the "ASP.NET and web development" workload
-- **MySQL Server 8.0.16+** (MySQL Workbench is a recommended client; XAMPP is also an option)
-- **MySQL Connector/NET** — tracked in `packages.config`; the required runtime
-  assemblies are included in `bin/` for the Web Site project.
+- **SQL Server Express LocalDB**, installed with Visual Studio 2022.
 
 ## 2. Set up the database
 
-1. Open MySQL Workbench (or phpMyAdmin if you're using XAMPP).
-2. Open `Database/edunest_schema.sql` and run the whole script. It safely creates
-   the `edunest_db` database and all 13 tables, then adds missing demo records.
-   It is repeatable and does not drop or overwrite existing application data.
-3. Run `Database/upgrade_platform_features.sql` to add catalog metadata and
-   assignment grading fields to existing installations. This migration is safe
-   to run again.
-4. Run `Database/upgrade_data_constraints.sql` to add database-level validation
-   checks. This migration is safe to run again.
-5. Run `Database/seed_modern_courses.sql` to add eleven technology courses with
-   learning topics, quizzes, questions, and practical assignments. It can be
-   rerun without duplicating the catalog.
-6. For app connections, use `Database/create_app_user.sql`: replace its password
-   placeholder and run it as a MySQL administrator. Put the same password in
-   `Web.ConnectionStrings.config`. The site needs CRUD access to `edunest_db`, not server admin.
+1. In Visual Studio, open **View → SQL Server Object Explorer**.
+2. Expand **SQL Server → (localdb)\MSSQLLocalDB**. Right-click it and choose
+   **New Query**.
+3. Open `Database/edunest_sqlserver.sql`, copy its contents into the query window,
+   then click **Execute**. This creates `EduNestDb`, its tables, demo accounts, and
+   an expanded catalog of 22 distinct courses with subject-specific illustrations.
 
 ### Demo accounts (all use the password `Password123`)
 
-The course seed creates three additional lecturer accounts and assigns courses across the instructor team.
+The SQL Server setup script creates these demo accounts.
 
 | Role      | Email                  |
 |-----------|------------------------|
@@ -53,16 +44,8 @@ The course seed creates three additional lecturer accounts and assigns courses a
 2. If Visual Studio prompts to restore NuGet packages, accept the restore.
    The project includes `packages.config` and the matching .NET Framework 4.8
    runtime assemblies in `bin/`.
-3. Copy `Web.ConnectionStrings.example.config` to `Web.ConnectionStrings.config`
-   (the latter is ignored by Git), then set its connection string to match your local
-   MySQL credentials:
-   ```xml
-   <add name="EduNestDB"
-        connectionString="Server=127.0.0.1;Port=3306;Database=edunest_db;Uid=edunest_app;Pwd=YOUR_APP_PASSWORD;"
-        providerName="MySql.Data.MySqlClient" />
-   ```
-   Use the same password you set in `Database/create_app_user.sql`. Keep the
-   local credentials file private. `Web.config` loads it automatically.
+3. `Web.ConnectionStrings.config` connects to `(localdb)\MSSQLLocalDB` and
+   `EduNestDb` using Windows authentication. `Web.config` loads it automatically.
 4. Press **F5** (or Ctrl+F5) to run. Visual Studio will launch it in IIS
    Express at a `localhost` URL.
 
@@ -71,7 +54,7 @@ The course seed creates three additional lecturer accounts and assigns courses a
 ```
 EduNest/
 ├── App_Code/              # Shared C# helper classes
-│   ├── DBHelper.cs         (all ADO.NET / MySQL access goes through here)
+│   ├── DBHelper.cs         (all ADO.NET / SQL Server access goes through here)
 │   ├── PasswordHelper.cs    (PBKDF2 password hashing with legacy hash upgrade)
 │   └── AuthHelper.cs        (session-based role guard used on every protected page)
 ├── Content/
@@ -80,11 +63,7 @@ EduNest/
 ├── Scripts/
 │   └── validation.js
 ├── Database/
-│   ├── edunest_schema.sql
-│   ├── upgrade_data_constraints.sql
-│   ├── upgrade_platform_features.sql
-│   ├── seed_modern_courses.sql
-│   └── create_app_user.sql
+│   └── edunest_sqlserver.sql # LocalDB schema and demo data
 ├── Web.ConnectionStrings.example.config
 ├── Web.config
 ├── Site.master / .cs       # Shared layout + role-aware navigation
@@ -149,7 +128,7 @@ student photo so the image loads without a remote request.
   like this added.
 - The Study Room Scheduler is a booking/RSVP system rather than a live video
   meeting tool (matches your proposal's in-scope description).
-- The local MySQL schema and database-backed public pages have been exercised
+- The SQL Server LocalDB schema is in `Database/edunest_sqlserver.sql`
   in this workspace. Configure the connection string and run both SQL setup
   scripts on any other computer before presenting the live demo.
 - Styling is intentionally clean/functional; feel free to reskin `site.css` to

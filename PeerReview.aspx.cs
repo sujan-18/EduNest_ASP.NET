@@ -1,6 +1,6 @@
 using System;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class PeerReview : System.Web.UI.Page
@@ -30,7 +30,7 @@ public partial class PeerReview : System.Web.UI.Page
                           AND NOT EXISTS (SELECT 1 FROM PeerReviews r WHERE r.SubmissionID = s.SubmissionID AND r.ReviewerID = @StudentID)
                         ORDER BY s.SubmittedDate DESC";
 
-        var dt = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        var dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         rptSubmissions.DataSource = dt;
         rptSubmissions.DataBind();
     }
@@ -43,7 +43,7 @@ public partial class PeerReview : System.Web.UI.Page
                         JOIN AssignmentSubmissions s ON r.SubmissionID = s.SubmissionID
                         JOIN Assignments a ON s.AssignmentID = a.AssignmentID
                         WHERE r.ReviewerID = @StudentID ORDER BY r.ReviewDate DESC";
-        gvMyReviews.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        gvMyReviews.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         gvMyReviews.DataBind();
     }
 
@@ -72,7 +72,7 @@ public partial class PeerReview : System.Web.UI.Page
                     WHERE author_enrollment.CourseID = a.CourseID AND author_enrollment.StudentID = s.StudentID)
                 AND NOT EXISTS (SELECT 1 FROM PeerReviews r
                     WHERE r.SubmissionID = s.SubmissionID AND r.ReviewerID = @ReviewerID)",
-            new MySqlParameter("@SubmissionID", submissionId), new MySqlParameter("@ReviewerID", reviewerId));
+            new SqlParameter("@SubmissionID", submissionId), new SqlParameter("@ReviewerID", reviewerId));
         if (Convert.ToInt32(eligible) == 0)
         {
             ShowMessage("That submission is no longer available for review.");
@@ -87,11 +87,12 @@ public partial class PeerReview : System.Web.UI.Page
             return;
         }
         DBHelper.ExecuteNonQuery(
-            "INSERT IGNORE INTO PeerReviews (SubmissionID, ReviewerID, Feedback, Rating) VALUES (@SubmissionID, @ReviewerID, @Feedback, @Rating)",
-            new MySqlParameter("@SubmissionID", submissionId),
-            new MySqlParameter("@ReviewerID", reviewerId),
-            new MySqlParameter("@Feedback", txtFeedback.Text.Trim()),
-            new MySqlParameter("@Rating", Convert.ToInt32(ddlRating.SelectedValue)));
+            @"IF NOT EXISTS (SELECT 1 FROM PeerReviews WHERE SubmissionID = @SubmissionID AND ReviewerID = @ReviewerID)
+              INSERT INTO PeerReviews (SubmissionID, ReviewerID, Feedback, Rating) VALUES (@SubmissionID, @ReviewerID, @Feedback, @Rating)",
+            new SqlParameter("@SubmissionID", submissionId),
+            new SqlParameter("@ReviewerID", reviewerId),
+            new SqlParameter("@Feedback", txtFeedback.Text.Trim()),
+            new SqlParameter("@Rating", Convert.ToInt32(ddlRating.SelectedValue)));
 
         ShowMessage("Review submitted. Thank you for helping a classmate!");
         LoadSubmissionsToReview();

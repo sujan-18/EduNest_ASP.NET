@@ -1,6 +1,6 @@
 using System;
 using System.Data;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class SubmitAssignment : System.Web.UI.Page
@@ -27,8 +27,8 @@ public partial class SubmitAssignment : System.Web.UI.Page
             @"SELECT a.Title, a.Description, a.DueDate FROM Assignments a
               JOIN Enrollments e ON e.CourseID = a.CourseID
               WHERE a.AssignmentID = @AssignmentID AND e.StudentID = @StudentID",
-            new MySqlParameter("@AssignmentID", AssignmentID),
-            new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@AssignmentID", AssignmentID),
+            new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
         if (assignments.Rows.Count == 0)
         {
             Response.Redirect("Assignments.aspx");
@@ -42,8 +42,8 @@ public partial class SubmitAssignment : System.Web.UI.Page
 
         DataTable existing = DBHelper.ExecuteQuery(
             "SELECT SubmissionText, Grade, Feedback FROM AssignmentSubmissions WHERE AssignmentID = @AssignmentID AND StudentID = @StudentID",
-            new MySqlParameter("@AssignmentID", AssignmentID),
-            new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@AssignmentID", AssignmentID),
+            new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
 
         if (existing.Rows.Count > 0)
         {
@@ -78,18 +78,25 @@ public partial class SubmitAssignment : System.Web.UI.Page
 
         object eligible = DBHelper.ExecuteScalar(
             @"SELECT COUNT(*) FROM Assignments a JOIN Enrollments e ON e.CourseID = a.CourseID
-              WHERE a.AssignmentID = @AssignmentID AND e.StudentID = @StudentID AND a.DueDate >= CURDATE()",
-            new MySqlParameter("@AssignmentID", AssignmentID), new MySqlParameter("@StudentID", studentId));
+              WHERE a.AssignmentID = @AssignmentID AND e.StudentID = @StudentID AND a.DueDate >= CAST(GETDATE() AS DATE)",
+            new SqlParameter("@AssignmentID", AssignmentID), new SqlParameter("@StudentID", studentId));
         if (Convert.ToInt32(eligible) == 0) { Response.Redirect("Assignments.aspx"); return; }
 
-        // Upsert: replace the previous submission if the student already submitted once
-        DBHelper.ExecuteNonQuery(
-            @"INSERT INTO AssignmentSubmissions (AssignmentID, StudentID, SubmissionText)
-              VALUES (@AssignmentID, @StudentID, @Text)
-              ON DUPLICATE KEY UPDATE SubmissionText = @Text, Grade = NULL, Feedback = NULL, SubmittedDate = CURRENT_TIMESTAMP",
-            new MySqlParameter("@AssignmentID", AssignmentID),
-            new MySqlParameter("@StudentID", studentId),
-            new MySqlParameter("@Text", txtSubmission.Text.Trim()));
+        // Update an existing submission, or insert the first one.
+        int updated = DBHelper.ExecuteNonQuery(
+            @"UPDATE AssignmentSubmissions
+              SET SubmissionText = @Text, Grade = NULL, Feedback = NULL, SubmittedDate = GETDATE()
+              WHERE AssignmentID = @AssignmentID AND StudentID = @StudentID",
+            new SqlParameter("@AssignmentID", AssignmentID),
+            new SqlParameter("@StudentID", studentId),
+            new SqlParameter("@Text", txtSubmission.Text.Trim()));
+        if (updated == 0)
+            DBHelper.ExecuteNonQuery(
+                @"INSERT INTO AssignmentSubmissions (AssignmentID, StudentID, SubmissionText)
+                  VALUES (@AssignmentID, @StudentID, @Text)",
+                new SqlParameter("@AssignmentID", AssignmentID),
+                new SqlParameter("@StudentID", studentId),
+                new SqlParameter("@Text", txtSubmission.Text.Trim()));
 
         pnlMessage.Visible = true;
         litMessage.Text = "Your assignment has been submitted.";

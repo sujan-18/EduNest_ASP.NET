@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class ManageCourses : System.Web.UI.Page
@@ -7,7 +7,25 @@ public partial class ManageCourses : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!AuthHelper.RequireRole(this, "Lecturer", "Admin")) return;
-        if (!IsPostBack) BindGrid();
+        if (!IsPostBack)
+        {
+            pnlLecturerPicker.Visible = Session["Role"] as string == "Admin";
+            if (pnlLecturerPicker.Visible) LoadLecturers();
+            BindGrid();
+        }
+    }
+
+    private void LoadLecturers()
+    {
+        ddlLecturer.Items.Clear();
+        ddlLecturer.Items.Add(new System.Web.UI.WebControls.ListItem("Select a lecturer", ""));
+        ddlLecturer.AppendDataBoundItems = true;
+        ddlLecturer.DataSource = DBHelper.ExecuteQuery(
+            "SELECT UserID, FullName FROM Users WHERE Role = 'Lecturer' AND IsActive = 1 ORDER BY FullName");
+        ddlLecturer.DataTextField = "FullName";
+        ddlLecturer.DataValueField = "UserID";
+        ddlLecturer.DataBind();
+        ddlLecturer.AppendDataBoundItems = false;
     }
 
     private void BindGrid()
@@ -18,8 +36,9 @@ public partial class ManageCourses : System.Web.UI.Page
         if (role == "Admin")
         {
             // Admin sees every course in the system
-            sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
-                     FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
+            sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours,
+                            COALESCE(u.FullName, '(lecturer unavailable)') AS LecturerName
+                     FROM dbo.Courses c LEFT JOIN dbo.Users u ON c.LecturerID = u.UserID
                      ORDER BY c.CreatedDate DESC";
             gvCourses.DataSource = DBHelper.ExecuteQuery(sql);
         }
@@ -27,10 +46,10 @@ public partial class ManageCourses : System.Web.UI.Page
         {
             // Lecturers only manage their own courses
             sql = @"SELECT c.CourseID, c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
-                     FROM Courses c JOIN Users u ON c.LecturerID = u.UserID
+                     FROM dbo.Courses c JOIN dbo.Users u ON c.LecturerID = u.UserID
                      WHERE c.LecturerID = @LecturerID
                      ORDER BY c.CreatedDate DESC";
-            gvCourses.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+            gvCourses.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
         }
         gvCourses.DataBind();
     }
@@ -47,14 +66,27 @@ public partial class ManageCourses : System.Web.UI.Page
             return;
         }
 
+        int lecturerId = AuthHelper.CurrentUserId(this);
+        if (Session["Role"] as string == "Admin")
+        {
+            if (!Int32.TryParse(ddlLecturer.SelectedValue, out lecturerId) ||
+                Convert.ToInt32(DBHelper.ExecuteScalar(
+                    "SELECT COUNT(*) FROM Users WHERE UserID = @LecturerID AND Role = 'Lecturer' AND IsActive = 1",
+                    new SqlParameter("@LecturerID", lecturerId))) == 0)
+            {
+                ShowMessage("Choose an active lecturer to teach this course.");
+                return;
+            }
+        }
+
         DBHelper.ExecuteNonQuery(
             "INSERT INTO Courses (Title, Description, Category, Level, EstimatedHours, LecturerID) VALUES (@Title, @Description, @Category, @Level, @Hours, @LecturerID)",
-            new MySqlParameter("@Title", txtTitle.Text.Trim()),
-            new MySqlParameter("@Description", txtDescription.Text.Trim()),
-            new MySqlParameter("@Category", ddlCategory.SelectedValue),
-            new MySqlParameter("@Level", ddlLevel.SelectedValue),
-            new MySqlParameter("@Hours", estimatedHours),
-            new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@Title", txtTitle.Text.Trim()),
+            new SqlParameter("@Description", txtDescription.Text.Trim()),
+            new SqlParameter("@Category", ddlCategory.SelectedValue),
+            new SqlParameter("@Level", ddlLevel.SelectedValue),
+            new SqlParameter("@Hours", estimatedHours),
+            new SqlParameter("@LecturerID", lecturerId));
 
         txtTitle.Text = "";
         txtDescription.Text = "";
@@ -103,14 +135,14 @@ public partial class ManageCourses : System.Web.UI.Page
 
         DBHelper.ExecuteNonQuery(
             "UPDATE Courses SET Title = @Title, Description = @Description, Category = @Category, Level = @Level, EstimatedHours = @Hours WHERE CourseID = @CourseID AND (@IsAdmin = 1 OR LecturerID = @LecturerID)",
-            new MySqlParameter("@Title", newTitle),
-            new MySqlParameter("@Description", newDescription),
-            new MySqlParameter("@Category", category),
-            new MySqlParameter("@Level", level),
-            new MySqlParameter("@Hours", estimatedHours),
-            new MySqlParameter("@CourseID", courseId),
-            new MySqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
-            new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@Title", newTitle),
+            new SqlParameter("@Description", newDescription),
+            new SqlParameter("@Category", category),
+            new SqlParameter("@Level", level),
+            new SqlParameter("@Hours", estimatedHours),
+            new SqlParameter("@CourseID", courseId),
+            new SqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
+            new SqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
 
         gvCourses.EditIndex = -1;
         ShowMessage("Course updated successfully.");
@@ -129,9 +161,9 @@ public partial class ManageCourses : System.Web.UI.Page
         }
         DBHelper.ExecuteNonQuery(
             "DELETE FROM Courses WHERE CourseID = @CourseID AND (@IsAdmin = 1 OR LecturerID = @LecturerID)",
-            new MySqlParameter("@CourseID", courseId),
-            new MySqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
-            new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@CourseID", courseId),
+            new SqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
+            new SqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
 
         ShowMessage("Course deleted.");
         BindGrid();
@@ -141,9 +173,9 @@ public partial class ManageCourses : System.Web.UI.Page
     {
         object result = DBHelper.ExecuteScalar(
             "SELECT COUNT(*) FROM Courses WHERE CourseID = @CourseID AND (@IsAdmin = 1 OR LecturerID = @LecturerID)",
-            new MySqlParameter("@CourseID", courseId),
-            new MySqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
-            new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+            new SqlParameter("@CourseID", courseId),
+            new SqlParameter("@IsAdmin", Session["Role"] as string == "Admin"),
+            new SqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
         return Convert.ToInt32(result) > 0;
     }
 

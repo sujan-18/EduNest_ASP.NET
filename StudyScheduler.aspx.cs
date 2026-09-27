@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class StudyScheduler : System.Web.UI.Page
@@ -17,14 +17,14 @@ public partial class StudyScheduler : System.Web.UI.Page
         string sql = @"SELECT s.SessionID, s.Title, s.SessionDate, s.SessionTime, s.Description,
                         u.FullName AS HostName,
                         (SELECT COUNT(*) FROM StudySessionParticipants p WHERE p.SessionID = s.SessionID) AS ParticipantCount,
-                        EXISTS(SELECT 1 FROM StudySessionParticipants p WHERE p.SessionID = s.SessionID AND p.StudentID = @UserID) AS HasJoined,
-                        (s.CreatedBy = @UserID) AS IsHost
+                        CASE WHEN EXISTS(SELECT 1 FROM StudySessionParticipants p WHERE p.SessionID = s.SessionID AND p.StudentID = @UserID) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS HasJoined,
+                        CASE WHEN s.CreatedBy = @UserID THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS IsHost
                         FROM StudySessions s
                         JOIN Users u ON s.CreatedBy = u.UserID
-                        WHERE s.SessionDate >= CURDATE()
+                        WHERE s.SessionDate >= CAST(GETDATE() AS DATE)
                         ORDER BY s.SessionDate, s.SessionTime";
 
-        rptSessions.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@UserID", userId));
+        rptSessions.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@UserID", userId));
         rptSessions.DataBind();
     }
 
@@ -44,11 +44,11 @@ public partial class StudyScheduler : System.Web.UI.Page
         DBHelper.ExecuteNonQuery(
             @"INSERT INTO StudySessions (CreatedBy, Title, SessionDate, SessionTime, Description)
               VALUES (@CreatedBy, @Title, @Date, @Time, @Description)",
-            new MySqlParameter("@CreatedBy", AuthHelper.CurrentUserId(this)),
-            new MySqlParameter("@Title", txtTitle.Text.Trim()),
-            new MySqlParameter("@Date", sessionDate.Date),
-            new MySqlParameter("@Time", sessionTime),
-            new MySqlParameter("@Description", txtDescription.Text.Trim()));
+            new SqlParameter("@CreatedBy", AuthHelper.CurrentUserId(this)),
+            new SqlParameter("@Title", txtTitle.Text.Trim()),
+            new SqlParameter("@Date", sessionDate.Date),
+            new SqlParameter("@Time", sessionTime),
+            new SqlParameter("@Description", txtDescription.Text.Trim()));
 
         txtTitle.Text = ""; txtDate.Text = ""; txtTime.Text = ""; txtDescription.Text = "";
         ShowMessage("Study session scheduled.");
@@ -64,17 +64,18 @@ public partial class StudyScheduler : System.Web.UI.Page
         {
             case "Join":
                 DBHelper.ExecuteNonQuery(
-                    "INSERT IGNORE INTO StudySessionParticipants (SessionID, StudentID) VALUES (@SessionID, @UserID)",
-                    new MySqlParameter("@SessionID", sessionId),
-                    new MySqlParameter("@UserID", userId));
+                    @"IF NOT EXISTS (SELECT 1 FROM StudySessionParticipants WHERE SessionID = @SessionID AND StudentID = @UserID)
+                      INSERT INTO StudySessionParticipants (SessionID, StudentID) VALUES (@SessionID, @UserID)",
+                    new SqlParameter("@SessionID", sessionId),
+                    new SqlParameter("@UserID", userId));
                 ShowMessage("You've joined the session.");
                 break;
 
             case "Leave":
                 DBHelper.ExecuteNonQuery(
                     "DELETE FROM StudySessionParticipants WHERE SessionID = @SessionID AND StudentID = @UserID",
-                    new MySqlParameter("@SessionID", sessionId),
-                    new MySqlParameter("@UserID", userId));
+                    new SqlParameter("@SessionID", sessionId),
+                    new SqlParameter("@UserID", userId));
                 ShowMessage("You've left the session.");
                 break;
 
@@ -82,8 +83,8 @@ public partial class StudyScheduler : System.Web.UI.Page
                 // Only the host (checked again server-side) may cancel their own session
                 DBHelper.ExecuteNonQuery(
                     "DELETE FROM StudySessions WHERE SessionID = @SessionID AND CreatedBy = @UserID",
-                    new MySqlParameter("@SessionID", sessionId),
-                    new MySqlParameter("@UserID", userId));
+                    new SqlParameter("@SessionID", sessionId),
+                    new SqlParameter("@UserID", userId));
                 ShowMessage("Session cancelled.");
                 break;
         }

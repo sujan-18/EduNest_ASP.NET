@@ -1,7 +1,7 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class ManageUsers : System.Web.UI.Page
@@ -40,7 +40,7 @@ public partial class ManageUsers : System.Web.UI.Page
 
         string email = txtEmail.Text.Trim().ToLower();
         object existing = DBHelper.ExecuteScalar("SELECT UserID FROM Users WHERE Email = @Email",
-            new MySqlParameter("@Email", email));
+            new SqlParameter("@Email", email));
 
         if (existing != null)
         {
@@ -53,11 +53,11 @@ public partial class ManageUsers : System.Web.UI.Page
 
         DBHelper.ExecuteNonQuery(
             "INSERT INTO Users (FullName, Email, PasswordHash, PasswordSalt, Role) VALUES (@Name, @Email, @Hash, @Salt, @Role)",
-            new MySqlParameter("@Name", txtFullName.Text.Trim()),
-            new MySqlParameter("@Email", email),
-            new MySqlParameter("@Hash", hash),
-            new MySqlParameter("@Salt", salt),
-            new MySqlParameter("@Role", ddlRole.SelectedValue));
+            new SqlParameter("@Name", txtFullName.Text.Trim()),
+            new SqlParameter("@Email", email),
+            new SqlParameter("@Hash", hash),
+            new SqlParameter("@Salt", salt),
+            new SqlParameter("@Role", ddlRole.SelectedValue));
 
         txtFullName.Text = ""; txtEmail.Text = ""; txtPassword.Text = "";
         ShowMessage("User created successfully.");
@@ -88,10 +88,10 @@ public partial class ManageUsers : System.Web.UI.Page
 
         DBHelper.ExecuteNonQuery(
             "UPDATE Users SET FullName = @Name, Role = @Role, IsActive = @Active WHERE UserID = @UserID",
-            new MySqlParameter("@Name", newName),
-            new MySqlParameter("@Role", newRole),
-            new MySqlParameter("@Active", isActive),
-            new MySqlParameter("@UserID", userId));
+            new SqlParameter("@Name", newName),
+            new SqlParameter("@Role", newRole),
+            new SqlParameter("@Active", isActive),
+            new SqlParameter("@UserID", userId));
 
         gvUsers.EditIndex = -1;
         ShowMessage("User updated.");
@@ -109,8 +109,25 @@ public partial class ManageUsers : System.Web.UI.Page
             return;
         }
 
-        DBHelper.ExecuteNonQuery("DELETE FROM Users WHERE UserID = @UserID", new MySqlParameter("@UserID", userId));
-        ShowMessage("User deleted.");
+        DBHelper.ExecuteNonQuery(
+            @"BEGIN TRY
+                  BEGIN TRANSACTION;
+                  DELETE FROM PeerReviews WHERE ReviewerID = @UserID;
+                  DELETE FROM CourseFeedback WHERE StudentID = @UserID;
+                  DELETE FROM StudySessionParticipants WHERE StudentID = @UserID;
+                  DELETE FROM TopicProgress WHERE StudentID = @UserID;
+                  DELETE FROM QuizAttempts WHERE StudentID = @UserID;
+                  DELETE FROM AssignmentSubmissions WHERE StudentID = @UserID;
+                  DELETE FROM Enrollments WHERE StudentID = @UserID;
+                  DELETE FROM Users WHERE UserID = @UserID;
+                  COMMIT TRANSACTION;
+              END TRY
+              BEGIN CATCH
+                  IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+                  THROW;
+              END CATCH;",
+            new SqlParameter("@UserID", userId));
+        ShowMessage("User and their linked student activity were deleted.");
         BindGrid();
     }
 

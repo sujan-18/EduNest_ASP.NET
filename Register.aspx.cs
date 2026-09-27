@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class Register : System.Web.UI.Page
@@ -23,7 +23,7 @@ public partial class Register : System.Web.UI.Page
         // Prevent duplicate email registration
         object existing = DBHelper.ExecuteScalar(
             "SELECT UserID FROM Users WHERE Email = @Email",
-            new MySqlParameter("@Email", email));
+            new SqlParameter("@Email", email));
 
         if (existing != null)
         {
@@ -37,11 +37,11 @@ public partial class Register : System.Web.UI.Page
         DBHelper.ExecuteNonQuery(
             @"INSERT INTO Users (FullName, Email, PasswordHash, PasswordSalt, Role)
               VALUES (@FullName, @Email, @Hash, @Salt, @Role)",
-            new MySqlParameter("@FullName", fullName),
-            new MySqlParameter("@Email", email),
-            new MySqlParameter("@Hash", hash),
-            new MySqlParameter("@Salt", salt),
-            new MySqlParameter("@Role", role));
+            new SqlParameter("@FullName", fullName),
+            new SqlParameter("@Email", email),
+            new SqlParameter("@Hash", hash),
+            new SqlParameter("@Salt", salt),
+            new SqlParameter("@Role", role));
 
         Response.Redirect("Login.aspx?registered=1");
     }

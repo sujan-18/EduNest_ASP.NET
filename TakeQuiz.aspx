@@ -13,14 +13,20 @@
     <asp:Panel ID="pnlQuiz" runat="server">
         <asp:Repeater ID="rptQuestions" runat="server" OnItemDataBound="rptQuestions_ItemDataBound">
             <ItemTemplate>
-                <div class="card" style="margin-bottom:16px;">
-                    <p><strong>Q<%#: Container.ItemIndex + 1 %>.</strong> <%#: Eval("QuestionText") %></p>
+                <section class="card quiz-question-card">
+                    <h2><span>Question <%#: Container.ItemIndex + 1 %></span></h2>
+                    <p><%#: Eval("QuestionText") %></p>
                     <asp:RadioButtonList runat="server" ID="rblOptions"
-                        RepeatLayout="Flow" />
+                        CssClass="quiz-answer-list" RepeatDirection="Vertical" RepeatLayout="UnorderedList" />
                     <asp:HiddenField runat="server" ID="hdnQuestionId" Value='<%# Eval("QuestionID") %>' />
-                </div>
+                </section>
             </ItemTemplate>
         </asp:Repeater>
+        <asp:Panel ID="pnlNoQuestions" runat="server" CssClass="empty-state" Visible="false">
+            <strong>This quiz has no questions yet.</strong>
+            <p>Choose another quiz or check back after your teacher adds questions.</p>
+            <a class="btn btn-small btn-primary" href="MyQuizzes.aspx">Back to my quizzes</a>
+        </asp:Panel>
         <asp:Button ID="btnSubmit" runat="server" Text="Submit Quiz" CssClass="btn btn-accent" OnClick="btnSubmit_Click" />
     </asp:Panel>
 

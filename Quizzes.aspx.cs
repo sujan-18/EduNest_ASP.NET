@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class Quizzes : System.Web.UI.Page
@@ -17,8 +17,8 @@ public partial class Quizzes : System.Web.UI.Page
             }
             object enrolled = DBHelper.ExecuteScalar(
                 "SELECT COUNT(*) FROM Enrollments WHERE CourseID = @CourseID AND StudentID = @StudentID",
-                new MySqlParameter("@CourseID", courseId),
-                new MySqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
+                new SqlParameter("@CourseID", courseId),
+                new SqlParameter("@StudentID", AuthHelper.CurrentUserId(this)));
             if (Convert.ToInt32(enrolled) == 0)
             {
                 Response.Redirect("Courses.aspx");
@@ -27,7 +27,7 @@ public partial class Quizzes : System.Web.UI.Page
             string sql = @"SELECT q.QuizID, q.Title, COUNT(qq.QuestionID) AS QuestionCount
                             FROM Quizzes q LEFT JOIN QuizQuestions qq ON q.QuizID = qq.QuizID
                             WHERE q.CourseID = @CourseID GROUP BY q.QuizID, q.Title";
-            rptQuizzes.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@CourseID", courseId));
+            rptQuizzes.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@CourseID", courseId));
             rptQuizzes.DataBind();
         }
     }

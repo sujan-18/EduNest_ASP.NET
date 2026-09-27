@@ -20,6 +20,7 @@
         <a href="ManageQuizzes.aspx"><span>&#63;</span><b>Quizzes</b><small>Manage questions and scores</small></a>
         <a href="ManageAssignments.aspx"><span>&#9998;</span><b>Assignments</b><small>Manage tasks and due dates</small></a>
         <a href="ReviewSubmissions.aspx"><span>&#10003;</span><b>Submission reviews</b><small>Review grades and feedback</small></a>
+        <a href="CourseFeedback.aspx"><span><svg class="nav-icon" aria-hidden="true"><use href="#icon-review" /></svg></span><b>Course feedback</b><small>Review learner ratings and comments</small></a>
     </div>
     </div>
 

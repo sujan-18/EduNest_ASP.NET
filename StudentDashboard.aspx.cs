@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class StudentDashboard : System.Web.UI.Page
@@ -38,7 +38,7 @@ public partial class StudentDashboard : System.Web.UI.Page
                         JOIN Enrollments e ON c.CourseID = e.CourseID
                         WHERE e.StudentID = @StudentID";
 
-        var dt = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+        var dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         // Guard against NULL percent when a course has zero topics yet
         foreach (System.Data.DataRow row in dt.Rows)
         {
@@ -54,23 +54,23 @@ public partial class StudentDashboard : System.Web.UI.Page
         int studentId = AuthHelper.CurrentUserId(this);
         litEnrolledCount.Text = DBHelper.ExecuteScalar(
             "SELECT COUNT(*) FROM Enrollments WHERE StudentID=@StudentID",
-            new MySqlParameter("@StudentID", studentId)).ToString();
+            new SqlParameter("@StudentID", studentId)).ToString();
         litCompletedCount.Text = DBHelper.ExecuteScalar(
             "SELECT COUNT(*) FROM TopicProgress WHERE StudentID=@StudentID",
-            new MySqlParameter("@StudentID", studentId)).ToString();
+            new SqlParameter("@StudentID", studentId)).ToString();
         litAttemptCount.Text = DBHelper.ExecuteScalar(
             "SELECT COUNT(*) FROM QuizAttempts WHERE StudentID=@StudentID",
-            new MySqlParameter("@StudentID", studentId)).ToString();
+            new SqlParameter("@StudentID", studentId)).ToString();
     }
 
     private void LoadQuizScores()
     {
         int studentId = AuthHelper.CurrentUserId(this);
-        string sql = @"SELECT q.Title AS QuizTitle, a.Score, a.TotalQuestions, a.AttemptDate
+        string sql = @"SELECT TOP 10 q.Title AS QuizTitle, a.Score, a.TotalQuestions, a.AttemptDate
                         FROM QuizAttempts a JOIN Quizzes q ON a.QuizID = q.QuizID
                         WHERE a.StudentID = @StudentID
-                        ORDER BY a.AttemptDate DESC LIMIT 10";
-        gvQuizScores.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+                        ORDER BY a.AttemptDate DESC";
+        gvQuizScores.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         gvQuizScores.DataBind();
     }
 
@@ -81,7 +81,7 @@ public partial class StudentDashboard : System.Web.UI.Page
             @"SELECT COUNT(*) AS AttemptCount,
                      AVG(Score * 100.0 / NULLIF(TotalQuestions, 0)) AS AveragePercent
               FROM QuizAttempts WHERE StudentID = @StudentID",
-            new MySqlParameter("@StudentID", studentId));
+            new SqlParameter("@StudentID", studentId));
 
         int attempts = Convert.ToInt32(result.Rows[0]["AttemptCount"]);
         if (attempts == 0)
@@ -128,7 +128,7 @@ public partial class StudentDashboard : System.Web.UI.Page
     private void LoadRecentActivity()
     {
         int studentId = AuthHelper.CurrentUserId(this);
-        string sql = @"SELECT Activity, CourseTitle, ActivityDate FROM (
+        string sql = @"SELECT TOP 10 Activity, CourseTitle, ActivityDate FROM (
                          SELECT CONCAT('Completed: ', t.Title) AS Activity, c.Title AS CourseTitle, p.CompletedDate AS ActivityDate
                          FROM TopicProgress p JOIN LearningPathTopics t ON t.TopicID = p.TopicID
                          JOIN Courses c ON c.CourseID = t.CourseID WHERE p.StudentID = @StudentID
@@ -140,24 +140,23 @@ public partial class StudentDashboard : System.Web.UI.Page
                          SELECT CONCAT('Submitted: ', a.Title), c.Title, s.SubmittedDate
                          FROM AssignmentSubmissions s JOIN Assignments a ON a.AssignmentID = s.AssignmentID
                          JOIN Courses c ON c.CourseID = a.CourseID WHERE s.StudentID = @StudentID
-                       ) activity_log ORDER BY ActivityDate DESC LIMIT 10";
-        gvActivity.DataSource = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+                       ) activity_log ORDER BY ActivityDate DESC";
+        gvActivity.DataSource = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         gvActivity.DataBind();
     }
 
     private void LoadUpcomingAssignments()
     {
         int studentId = AuthHelper.CurrentUserId(this);
-        string sql = @"SELECT a.AssignmentID, a.Title, a.DueDate, c.Title AS CourseTitle,
-                              EXISTS(SELECT 1 FROM AssignmentSubmissions s
-                                  WHERE s.AssignmentID = a.AssignmentID AND s.StudentID = @StudentID) AS HasSubmitted
+        string sql = @"SELECT TOP 5 a.AssignmentID, a.Title, a.DueDate, c.Title AS CourseTitle,
+                              CASE WHEN EXISTS(SELECT 1 FROM AssignmentSubmissions s
+                                  WHERE s.AssignmentID = a.AssignmentID AND s.StudentID = @StudentID) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS HasSubmitted
                        FROM Assignments a
                        JOIN Courses c ON c.CourseID = a.CourseID
                        JOIN Enrollments e ON e.CourseID = c.CourseID AND e.StudentID = @StudentID
-                       WHERE a.DueDate >= CURDATE()
-                       ORDER BY a.DueDate, a.Title
-                       LIMIT 5";
-        var assignments = DBHelper.ExecuteQuery(sql, new MySqlParameter("@StudentID", studentId));
+                       WHERE a.DueDate >= CAST(GETDATE() AS DATE)
+                       ORDER BY a.DueDate, a.Title";
+        var assignments = DBHelper.ExecuteQuery(sql, new SqlParameter("@StudentID", studentId));
         rptUpcomingAssignments.DataSource = assignments;
         rptUpcomingAssignments.DataBind();
         pnlNoUpcomingAssignments.Visible = assignments.Rows.Count == 0;

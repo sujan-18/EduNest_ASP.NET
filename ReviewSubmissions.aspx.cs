@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class ReviewSubmissions : System.Web.UI.Page
@@ -31,7 +31,7 @@ public partial class ReviewSubmissions : System.Web.UI.Page
         var courses = role == "Admin"
             ? DBHelper.ExecuteQuery("SELECT CourseID, Title FROM Courses ORDER BY Title")
             : DBHelper.ExecuteQuery("SELECT CourseID, Title FROM Courses WHERE LecturerID=@LecturerID ORDER BY Title",
-                new MySqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
+                new SqlParameter("@LecturerID", AuthHelper.CurrentUserId(this)));
         ddlCourse.Items.Clear();
         ddlCourse.Items.Add(new ListItem("All my courses", "0"));
         ddlCourse.AppendDataBoundItems = true;
@@ -59,11 +59,11 @@ public partial class ReviewSubmissions : System.Web.UI.Page
                        JOIN Users student ON student.UserID = s.StudentID
                        WHERE (@IsAdmin = 1 OR c.LecturerID = @LecturerID)
                          AND (@CourseID = 0 OR c.CourseID = @CourseID)
-                       ORDER BY (s.Grade IS NULL) DESC, s.SubmittedDate DESC";
+                       ORDER BY CASE WHEN s.Grade IS NULL THEN 1 ELSE 0 END DESC, s.SubmittedDate DESC";
         gvSubmissions.DataSource = DBHelper.ExecuteQuery(sql,
-            new MySqlParameter("@IsAdmin", isAdmin),
-            new MySqlParameter("@LecturerID", lecturerId),
-            new MySqlParameter("@CourseID", SelectedCourseId));
+            new SqlParameter("@IsAdmin", isAdmin),
+            new SqlParameter("@LecturerID", lecturerId),
+            new SqlParameter("@CourseID", SelectedCourseId));
         gvSubmissions.DataBind();
     }
 
@@ -95,9 +95,9 @@ public partial class ReviewSubmissions : System.Web.UI.Page
               JOIN Assignments a ON a.AssignmentID = s.AssignmentID
               JOIN Courses c ON c.CourseID = a.CourseID
               WHERE s.SubmissionID=@SubmissionID AND (@IsAdmin=1 OR c.LecturerID=@LecturerID)",
-            new MySqlParameter("@SubmissionID", submissionId),
-            new MySqlParameter("@IsAdmin", isAdmin),
-            new MySqlParameter("@LecturerID", lecturerId));
+            new SqlParameter("@SubmissionID", submissionId),
+            new SqlParameter("@IsAdmin", isAdmin),
+            new SqlParameter("@LecturerID", lecturerId));
         if (Convert.ToInt32(allowed) == 0)
         {
             gvSubmissions.EditIndex = -1;
@@ -129,9 +129,9 @@ public partial class ReviewSubmissions : System.Web.UI.Page
 
         DBHelper.ExecuteNonQuery(
             "UPDATE AssignmentSubmissions SET Grade=@Grade, Feedback=@Feedback WHERE SubmissionID=@SubmissionID",
-            new MySqlParameter("@Grade", gradeValue),
-            new MySqlParameter("@Feedback", feedback.Length == 0 ? (object)DBNull.Value : feedback),
-            new MySqlParameter("@SubmissionID", submissionId));
+            new SqlParameter("@Grade", gradeValue),
+            new SqlParameter("@Feedback", feedback.Length == 0 ? (object)DBNull.Value : feedback),
+            new SqlParameter("@SubmissionID", submissionId));
 
         gvSubmissions.EditIndex = -1;
         ShowMessage("Review saved. The student can now see the grade and feedback.");

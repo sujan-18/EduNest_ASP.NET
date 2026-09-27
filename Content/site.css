@@ -91,6 +91,21 @@ a { color: var(--teal-dark); }
 .card-grid > .card:nth-child(2n):before { background: #9187d7; }
 .card-grid > .card:nth-child(3n):before { background: #64a795; }
 
+/* Student lesson notes and learning resources */
+.learning-path-heading { max-width: 1050px; }
+.learning-course-description { max-width: 850px; font-size: 1.08rem; line-height: 1.75; }
+.learning-lesson { padding: 30px; }
+.learning-lesson h2 { margin: 0 0 16px; font-size: 1.45rem; }
+.learning-lesson:before { margin-bottom: 14px !important; }
+.lesson-step { margin: 0 0 8px; color: var(--muted, #727c8d); font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.lesson-content { color: var(--text, #20283a); font-size: 1rem; line-height: 1.85; white-space: pre-line; }
+.lesson-content-end { display: block; height: 1px; width: 1px; }
+.lesson-resource { display: inline-flex; margin-top: 20px; color: var(--navy, #1d3c7e); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.lesson-complete { display: inline-block; margin-top: 18px; }
+.course-progress { margin-top: 16px; color: var(--navy, #1d3c7e); font-weight: 700; }
+.course-complete-banner { margin-top: 14px; padding: 16px 20px; border: 1px solid #b9dfd2; border-radius: 12px; color: #176552; background: #e9f7f1; font-weight: 700; }
+.lesson-complete-action:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
 /* Buttons, forms and validation */
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border: 0; border-radius: 12px; color: #fff; background: var(--teal); font: 600 14px 'Outfit', 'Segoe UI', Arial, sans-serif; text-decoration: none; cursor: pointer; transition: transform .16s, background .16s, box-shadow .16s; }
 .btn:hover { transform: translateY(-1px); color: #fff; background: var(--teal-dark); box-shadow: 0 8px 17px rgba(39,104,95,.18); }
@@ -792,6 +807,29 @@ html.page-leaving .app-frame { opacity: 0; transform: translateY(5px); transitio
 .users-data-table th:nth-child(5), .users-data-table td:nth-child(5) { width: 27%; }
 .users-data-table input[type=submit] { min-width: 74px; min-height: 34px; margin: 2px; padding: 6px 10px; border: 1px solid #d7e0e8; border-radius: 8px; color: #25364b; background: #f4f7f9; font: 600 12px Outfit, sans-serif; cursor: pointer; }
 .users-data-table input[type=submit]:hover { border-color: #c5d5e8; background: #eaf1f8; }
+
+/* Keep the course management columns readable instead of compressing text. */
+.course-admin-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 15px; }
+.course-admin-table.data-table { display: table; width: 100%; min-width: 1120px; table-layout: fixed; }
+.course-admin-table th, .course-admin-table td { white-space: normal; overflow-wrap: anywhere; }
+.course-admin-table th:nth-child(1), .course-admin-table td:nth-child(1) { width: 5%; }
+.course-admin-table th:nth-child(2), .course-admin-table td:nth-child(2) { width: 17%; }
+.course-admin-table th:nth-child(3), .course-admin-table td:nth-child(3) { width: 31%; }
+.course-admin-table th:nth-child(4), .course-admin-table td:nth-child(4) { width: 11%; }
+.course-admin-table th:nth-child(5), .course-admin-table td:nth-child(5) { width: 8%; }
+.course-admin-table th:nth-child(6), .course-admin-table td:nth-child(6) { width: 7%; }
+.course-admin-table th:nth-child(7), .course-admin-table td:nth-child(7) { width: 10%; }
+.course-admin-table th:nth-child(8), .course-admin-table td:nth-child(8) { width: 11%; min-width: 140px; }
+.course-admin-table th:nth-child(8), .course-admin-table td:nth-child(8) { white-space: nowrap; }
+.course-admin-table td:nth-child(8) input[type=submit] { display: block; min-width: 72px; margin: 3px 0; }
+
+.quiz-question-card { margin-bottom: 16px; }
+.quiz-question-card h2 { margin: 0 0 12px; color: var(--ink-soft); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+.quiz-question-card > p { margin: 0 0 16px; color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.55; }
+.quiz-answer-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.quiz-answer-list li { margin: 0; padding: 0; }
+.quiz-answer-list li label { display: inline-block; max-width: calc(100% - 34px); margin-left: 9px; color: var(--ink); font-size: 15px; line-height: 1.5; vertical-align: top; cursor: pointer; }
+.quiz-answer-list li input[type=radio] { margin: 3px 0 0; vertical-align: top; accent-color: var(--orange); }
 @media (max-width: 900px) {
     .user-create-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

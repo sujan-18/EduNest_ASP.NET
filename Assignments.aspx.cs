@@ -1,5 +1,5 @@
 using System;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class Assignments : System.Web.UI.Page
@@ -16,7 +16,7 @@ public partial class Assignments : System.Web.UI.Page
         int studentId = AuthHelper.CurrentUserId(this);
         if (Convert.ToInt32(DBHelper.ExecuteScalar(
             "SELECT COUNT(*) FROM Enrollments WHERE CourseID = @CourseID AND StudentID = @StudentID",
-            new MySqlParameter("@CourseID", courseId), new MySqlParameter("@StudentID", studentId))) == 0)
+            new SqlParameter("@CourseID", courseId), new SqlParameter("@StudentID", studentId))) == 0)
         {
             Response.Redirect("Courses.aspx");
             return;
@@ -25,11 +25,11 @@ public partial class Assignments : System.Web.UI.Page
         if (!IsPostBack)
         {
             string sql = @"SELECT a.AssignmentID, a.Title, a.Description, a.DueDate,
-                            EXISTS(SELECT 1 FROM AssignmentSubmissions s WHERE s.AssignmentID = a.AssignmentID AND s.StudentID = @StudentID) AS HasSubmitted
+                            CASE WHEN EXISTS(SELECT 1 FROM AssignmentSubmissions s WHERE s.AssignmentID = a.AssignmentID AND s.StudentID = @StudentID) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS HasSubmitted
                             FROM Assignments a WHERE a.CourseID = @CourseID ORDER BY a.DueDate";
             rptAssignments.DataSource = DBHelper.ExecuteQuery(sql,
-                new MySqlParameter("@StudentID", studentId),
-                new MySqlParameter("@CourseID", courseId));
+                new SqlParameter("@StudentID", studentId),
+                new SqlParameter("@CourseID", courseId));
             rptAssignments.DataBind();
         }
     }

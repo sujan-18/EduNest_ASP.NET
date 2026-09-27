@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>EduNest | Smart Campus Learning Hub</title>
-    <link rel="stylesheet" type="text/css" href="Content/site.css?v=real-rating-icon-1" />
+    <link rel="stylesheet" type="text/css" href="Content/site.css?v=quiz-layout-1" />
 
     <script src="Scripts/validation.js"></script>
     <script src="Scripts/navigation.js?v=mobile-nav-1" defer></script>
@@ -62,6 +62,7 @@
                             <a class="sidebar-link" href="ManageQuizzes.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-quiz" /></svg>Quizzes</a>
                             <a class="sidebar-link" href="ManageAssignments.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-assignment" /></svg>Assignments</a>
                             <a class="sidebar-link" href="ReviewSubmissions.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-check" /></svg>Review work</a>
+                             <a class="sidebar-link" href="CourseFeedback.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-review" /></svg>Course feedback</a>
                         </asp:PlaceHolder>
                         <asp:PlaceHolder ID="phAdmin" runat="server" Visible="false">
                             <a class="sidebar-link" href="AdminDashboard.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-dashboard" /></svg>Dashboard</a>
@@ -71,6 +72,7 @@
                             <a class="sidebar-link" href="ManageQuizzes.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-quiz" /></svg>Quizzes</a>
                             <a class="sidebar-link" href="ManageAssignments.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-assignment" /></svg>Assignments</a>
                             <a class="sidebar-link" href="ReviewSubmissions.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-check" /></svg>Submissions</a>
+                             <a class="sidebar-link" href="CourseFeedback.aspx"><svg class="nav-icon" aria-hidden="true"><use href="#icon-review" /></svg>Course feedback</a>
                         </asp:PlaceHolder>
                     </nav>
 

@@ -34,7 +34,9 @@
                         <asp:Button runat="server" CommandName="Enroll" CommandArgument='<%# Eval("CourseID") %>' Text="Enroll"
                             CssClass="btn btn-small btn-primary" Visible='<%# IsStudent() && !Convert.ToBoolean(Eval("IsEnrolled")) %>' />
                         <asp:HyperLink runat="server" Text="Continue" CssClass="btn btn-small btn-primary"
-                            NavigateUrl='<%# "LearningPath.aspx?CourseID=" + Eval("CourseID") %>' Visible='<%# IsStudent() && Convert.ToBoolean(Eval("IsEnrolled")) %>' /></div>
+                            NavigateUrl='<%# "LearningPath.aspx?CourseID=" + Eval("CourseID") %>' Visible='<%# IsStudent() && Convert.ToBoolean(Eval("IsEnrolled")) %>' />
+                        <asp:HyperLink runat="server" Text="Quizzes" CssClass="btn btn-small btn-outline"
+                            NavigateUrl='<%# "Quizzes.aspx?CourseID=" + Eval("CourseID") %>' Visible='<%# IsStudent() && Convert.ToBoolean(Eval("IsEnrolled")) %>' /></div>
                     </div>
                 </div>
             </article>

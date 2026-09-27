@@ -1,18 +1,18 @@
 using System;
 using System.Data;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using EduNest.App_Code;
 
 public partial class Login : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        if (!IsPostBack && AuthHelper.IsKnownRole(Session["Role"] as string))
+        string currentRole = Session["Role"] as string;
+        pnlCurrentSession.Visible = AuthHelper.IsKnownRole(currentRole);
+        if (pnlCurrentSession.Visible)
         {
-            Response.Redirect(AuthHelper.DashboardForRole(Session["Role"] as string));
-            return;
+            litCurrentSession.Text = Server.HtmlEncode(Convert.ToString(Session["FullName"]) + " (" + currentRole + ")");
         }
-        if (!IsPostBack && Session["Role"] != null) Session.Clear();
         if (!IsPostBack && Request.QueryString["registered"] == "1")
         {
             pnlSuccess.Visible = true;
@@ -28,7 +28,7 @@ public partial class Login : System.Web.UI.Page
 
         DataTable dt = DBHelper.ExecuteQuery(
             "SELECT UserID, FullName, PasswordHash, PasswordSalt, Role, IsActive FROM Users WHERE Email = @Email",
-            new MySqlParameter("@Email", email));
+            new SqlParameter("@Email", email));
 
         if (dt.Rows.Count == 0)
         {
@@ -60,12 +60,13 @@ public partial class Login : System.Web.UI.Page
             string upgradedSalt = PasswordHelper.GenerateSalt();
             DBHelper.ExecuteNonQuery(
                 "UPDATE Users SET PasswordHash = @Hash, PasswordSalt = @Salt WHERE UserID = @UserID",
-                new MySqlParameter("@Hash", PasswordHelper.HashPassword(password, upgradedSalt)),
-                new MySqlParameter("@Salt", upgradedSalt),
-                new MySqlParameter("@UserID", row["UserID"]));
+                new SqlParameter("@Hash", PasswordHelper.HashPassword(password, upgradedSalt)),
+                new SqlParameter("@Salt", upgradedSalt),
+                new SqlParameter("@UserID", row["UserID"]));
         }
 
-        // Successful login: start the session
+        // Replace any previous role's session when switching accounts.
+        Session.Clear();
         Session["UserID"] = Convert.ToInt32(row["UserID"]);
         Session["FullName"] = row["FullName"].ToString();
         Session["Role"] = row["Role"].ToString();

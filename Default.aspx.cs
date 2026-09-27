@@ -15,11 +15,10 @@ public partial class Default : System.Web.UI.Page
     private void LoadFeaturedCourses()
     {
         litCourseCount.Text = Convert.ToInt32(DBHelper.ExecuteScalar("SELECT COUNT(*) FROM Courses")).ToString();
-        string sql = @"SELECT c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
+        string sql = @"SELECT TOP 4 c.Title, c.Description, c.Category, c.Level, c.EstimatedHours, u.FullName AS LecturerName
                         FROM Courses c
                         JOIN Users u ON c.LecturerID = u.UserID
-                        ORDER BY c.CreatedDate DESC, c.CourseID DESC
-                        LIMIT 4";
+                        ORDER BY c.CreatedDate DESC, c.CourseID DESC";
         DataTable courses = DBHelper.ExecuteQuery(sql);
         courses.Columns.Add("ImagePath", typeof(string));
         foreach (DataRow course in courses.Rows)

@@ -21,6 +21,10 @@
             <label>Description</label>
             <asp:TextBox ID="txtDescription" runat="server" TextMode="MultiLine" />
         </div>
+        <asp:Panel ID="pnlLecturerPicker" runat="server" Visible="false" CssClass="form-group">
+            <label>Assign lecturer</label>
+            <asp:DropDownList ID="ddlLecturer" runat="server" />
+        </asp:Panel>
         <div class="course-admin-fields">
             <div class="form-group"><label>Subject category</label>
                 <asp:DropDownList ID="ddlCategory" runat="server">
@@ -44,7 +48,8 @@
     </div>
 
     <!-- ============ DISPLAY / UPDATE / DELETE ============ -->
-    <asp:GridView ID="gvCourses" runat="server" AutoGenerateColumns="false" CssClass="data-table"
+    <div class="course-admin-table-wrap">
+    <asp:GridView ID="gvCourses" runat="server" AutoGenerateColumns="false" CssClass="data-table course-admin-table"
         DataKeyNames="CourseID" OnRowEditing="gvCourses_RowEditing" OnRowCancelingEdit="gvCourses_RowCancelingEdit"
         OnRowUpdating="gvCourses_RowUpdating" OnRowDeleting="gvCourses_RowDeleting" GridLines="None">
         <Columns>
@@ -74,5 +79,6 @@
                 ButtonType="Button" ControlStyle-CssClass="btn btn-small" />
         </Columns>
     </asp:GridView>
+    </div>
 
 </asp:Content>

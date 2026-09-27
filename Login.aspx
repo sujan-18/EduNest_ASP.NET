@@ -8,6 +8,10 @@
         <h2>Log In to EduNest</h2>
         <p class="login-role-hint">Your account role opens its own workspace automatically: Student, Teacher (Lecturer), or Administrator.</p>
 
+        <asp:Panel ID="pnlCurrentSession" runat="server" Visible="false">
+            <div class="alert alert-info">Currently signed in as <asp:Literal ID="litCurrentSession" runat="server" />. Logging in here will switch to the selected account.</div>
+        </asp:Panel>
+
         <asp:Panel ID="pnlSuccess" runat="server" Visible="false">
             <div class="alert alert-success">Registration successful! You can now log in.</div>
         </asp:Panel>
